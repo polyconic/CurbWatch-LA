@@ -99,8 +99,8 @@ save('osm_green.json', overpass(f'[out:json][timeout:180];(way["leisure"~"^(park
 save('osm_parking.json', overpass(f'[out:json][timeout:120];(nwr["amenity"="parking"]{box};nwr["parking"]["amenity"!="parking"]{box};);out tags center;'))
 save('alpr.json', overpass(f'[out:json][timeout:120];(nwr["surveillance:type"="ALPR"]{box};nwr["surveillance:type"="alpr"]{box};);out tags center;'))
 
-# Dodgers home schedule (District D game-day restrictions)
-save('dodgers.json', json.loads(get(f'https://statsapi.mlb.com/api/v1/schedule?sportId=1&teamId=119&season={TODAY.year}&gameType=R,F,D,L,W,S&hydrate=venue')))
+# Dodger Stadium home dates (District D game-day restrictions) are kept by hand in tools/dodgers-home.json —
+# schedule facts, no API terms attached. Add next season from the published schedule.
 
 (RAW / 'meta.json').write_text(json.dumps({'fetched': datetime.datetime.now().isoformat(timespec='minutes'), 'cite_from': CITE_FROM, 'permit_from': PERMIT_FROM}))
 print('done — now run: python tools/build.py')

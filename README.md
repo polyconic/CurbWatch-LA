@@ -24,6 +24,9 @@ python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
 - **West Hollywood:** city GIS permit blocks with posted hours, permit districts, sweeping lines, and public lots
 - **LA County:** address points, city boundaries
 - **OpenStreetMap:** streets, parks, parking lots, and plate-reader (ALPR) cameras, which is the same data DeFlock shows. © OpenStreetMap contributors
-- **MLB Stats API:** Dodgers home schedule
+- **Dodger Stadium home dates:** hand-maintained in `tools/dodgers-home.json`
+
+Terms differ by layer — see [DATA-LICENSE.md](DATA-LICENSE.md). The OSM-derived parts of
+`curb-data.js` are a derivative database under ODbL 1.0.
 
 City data isn't the curb. Red curbs, hydrants, driveways and temporary signs aren't mapped, and the posted sign always wins.

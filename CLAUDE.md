@@ -55,3 +55,25 @@ and the `blocks` decode in `index.html` before changing either.
   one side each day, and the data doesn't say which side.
 - LA's occupancy feed timestamps are UTC; display converts to LA time.
 - Parkopedia was tried and rejected (403, client-rendered, proprietary).
+- Dodger dates live in `tools/dodgers-home.json`, hand-maintained on purpose: MLB's Stats
+  API limits use to individual, non-commercial, non-bulk. Add next season by hand.
+- `curb-data.js` mixes ODbL (OSM) and city-open-data fields and carries a notice saying
+  which is which — see `DATA-LICENSE.md`. Keep the OSM attribution in the page footer.
+
+## Sweeping-ticket anomalies (checked 2026-09-11, don't republish the first number)
+
+A first pass said 2,473 street-cleaning tickets (~$168k/6mo) didn't match the posted
+schedule. Verifying per block killed most of it:
+
+- 19% of tickets sit on blocks where our route assignment itself looks wrong — excluded.
+- Of tickets on well-modelled blocks (≥90% matching), the residue is 1,377, and most of
+  that is method noise: 591 where no route polygon covers the point, 650 wrong-day and 93
+  wrong-week cases that two-sided routes and polygon edges can explain.
+- What survives: **43 tickets (~$2.7k) written on the correct posted day but outside the
+  posted hours**, spread over 32 blocks.
+- Holiday claim was wrong: the 14 "holiday" hits were 2026-04-03, Good Friday, which is
+  not an LA city holiday. Zero confirmed holiday tickets.
+
+So the "they ticket when no sweeper came" story is NOT provable from open data — LA
+publishes no sweeper GPS or completion records. Per-ticket schedule mismatch is real but
+rare. Any public number must come from the verified column, not the first pass.

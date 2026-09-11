@@ -224,17 +224,9 @@ for r in cit:
     cpts.append(Point(proj(lon, lat))); cmeta.append((c, dow * 24 + t // 100, r.get('violation_description') or '', r.get('fine_amount'), r['issue_date'][:10], parse_loc(r.get('location'))))
     latest = max(latest, r['issue_date'][:10])
 cmatch = match_blocks(cpts, [m[5] for m in cmeta], fallback=20)
-from zoneinfo import ZoneInfo
-dj = json.load(open('dodgers.json'))
-games = []; game_days = set()
-for dd in dj['dates']:
-    for g in dd['games']:
-        if g['teams']['home']['team']['id'] != 119 or 'Dodger' not in g['venue']['name']: continue
-        if g['status']['detailedState'] in ('Postponed', 'Cancelled'): continue
-        game_days.add(g['officialDate'])
-        lt = datetime.datetime.fromisoformat(g['gameDate'].replace('Z', '+00:00')).astimezone(ZoneInfo('America/Los_Angeles'))
-        games.append([lt.strftime('%Y-%m-%dT%H:%M'), g['teams']['away']['team']['name'], g['gameType']])
+games = json.load(open(ROOT / 'tools' / 'dodgers-home.json'))['games']
 games.sort()
+game_days = {g[0][:10] for g in games}
 D['games'] = games
 bev = collections.defaultdict(lambda: [0, 0])
 bcit = collections.defaultdict(collections.Counter)
@@ -436,5 +428,11 @@ print('alpr', len(alpr), sum(a[2] for a in alpr))
 
 D['meta'] = dict(built=datetime.datetime.now().strftime('%Y-%m-%d %H:%M'), lon0=LON0, lat0=LAT0)
 s = json.dumps(D, separators=(',', ':'))
-(ROOT / 'curb-data.js').write_text('window.CURB=' + s + ';')
+NOTICE = ('/*! CurbWatch LA data snapshot. Street geometry, labels, parks/water, off-street lots tagged src "OSM" and the alpr\n'
+          ' * (plate-reader) points are derived from OpenStreetMap, (c) OpenStreetMap contributors, licensed under the\n'
+          ' * Open Database License (ODbL) 1.0 - https://opendatacommons.org/licenses/odbl/1-0/ . Those fields form a\n'
+          ' * derivative database: redistribute them under ODbL. Remaining layers (sweeping routes, street blocks,\n'
+          ' * meters, citations, city lots, addresses, West Hollywood permit/sweeping data) come from City of Los Angeles,\n'
+          ' * LA County and City of West Hollywood open data under their own terms. See DATA-LICENSE.md. */\n')
+(ROOT / 'curb-data.js').write_text(NOTICE + 'window.CURB=' + s + ';')
 print('size MB', len(s) / 1e6, {k: len(json.dumps(v, separators=(',', ':'))) // 1000 for k, v in D.items()})
