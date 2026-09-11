@@ -91,11 +91,19 @@ button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 #map{position:fixed;inset:0}
 .panel{position:fixed;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);z-index:2}
-#rail{top:16px;left:16px;width:368px;max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;padding:6px 0}
+#rail{top:16px;left:16px;width:384px;max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;padding:6px 0}
 #detail{top:16px;right:16px;width:384px;max-height:calc(100dvh - 32px);overflow:auto;padding:6px 0}
 #detail[hidden]{display:none}
 .sec{padding:14px 20px;display:flex;flex-direction:column;gap:10px}
 .sec+.sec{border-top:1px solid var(--line-2)}
+.brand{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.brandbtns{display:flex;align-items:center;gap:6px;flex:none;margin-top:2px}
+.iconbtn{width:30px;height:30px;border:0;border-radius:50%;background:var(--panel-2);color:var(--ink-2);cursor:pointer;display:grid;place-items:center;padding:0;transition:background .15s,color .15s}
+.iconbtn:hover{background:var(--line);color:var(--ink)}
+.iconbtn svg{width:16px;height:16px}
+.iconbtn .moon{display:none}
+:root[data-theme="dark"] .iconbtn .moon{display:block}
+:root[data-theme="dark"] .iconbtn .sun{display:none}
 .brand h1{margin:0;font:600 30px/1 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 60;letter-spacing:-.01em}
 .brand h1 span{color:var(--moss)}
 .brand p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.45}
@@ -121,7 +129,7 @@ button,input,select{font:inherit;color:inherit}
 .gamenote.on{color:var(--ink);background:color-mix(in srgb,var(--red) 12%,transparent);border-left:3px solid var(--red);padding:7px 10px;border-radius:10px}
 .win{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .win label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}
-.win input{height:34px;width:100%;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:0 6px;font-size:13px;min-width:0;color-scheme:light dark}
+.win input{height:34px;width:100%;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:0 6px;font-size:12.5px;min-width:0;color-scheme:light dark}
 .win input::-webkit-datetime-edit{padding:0}
 .win input::-webkit-calendar-picker-indicator{margin-left:2px;padding:0}
 .tabs{display:flex;gap:4px;background:var(--panel-2);border-radius:999px;padding:3px}
@@ -201,7 +209,6 @@ details.src p{margin:6px 0 0}
   #rail{left:8px;right:8px;top:8px;width:auto;max-height:52dvh}
   #rail.collapsed .more{display:none}
   .railtoggle{display:inline-block}
-  .brand{display:flex;align-items:center;justify-content:space-between}
   #detail{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:56dvh}
   .zoom{display:none}
 }
@@ -215,7 +222,13 @@ details.src p{margin:6px 0 0}
   <div class="sec">
     <div class="brand">
       <h1>CurbWatch <span>LA</span></h1>
-      <button class="chip railtoggle" id="railToggle" aria-expanded="false">Options</button>
+      <div class="brandbtns">
+        <button class="iconbtn" id="theme" type="button" aria-label="Switch theme" title="Switch theme">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M20.5 14.3A8.6 8.6 0 0 1 9.7 3.5a8.6 8.6 0 1 0 10.8 10.8z"/></svg>
+        </button>
+        <button class="chip railtoggle" id="railToggle" aria-expanded="false">Options</button>
+      </div>
     </div>
     <p class="brand-p note" style="margin:0">Echo Park to West Hollywood. Search an address, or click a block, to see what its signs say and who gets ticketed there.</p>
     <div class="search">
@@ -895,8 +908,8 @@ $('#saved').onclick = e => { if (e.target.tagName === 'BUTTON') go(e.target.text
 readTokens();
 const el = $('#map');
 function fitView() {
-  const w = el.clientWidth, wide = w > 900, free = wide ? w - 400 - 416 + 120 : w, z = Math.log2(free / 512 * 360 / 0.166);
-  const shift = wide ? (400 - 416) / 2 : 0, zz = Math.min(Math.max(z, 11), 14);
+  const w = el.clientWidth, wide = w > 900, free = wide ? w - 416 - 416 + 120 : w, z = Math.log2(free / 512 * 360 / 0.166);
+  const shift = wide ? 0 : 0, zz = Math.min(Math.max(z, 11), 14);
   return { longitude: -118.3125 - shift * 360 / (512 * Math.pow(2, zz)), latitude: 34.0805, zoom: zz, pitch: 0, bearing: 0, minZoom: 11, maxZoom: 19 };
 }
 let vs = fitView(); viewZoom = vs.zoom;
@@ -916,8 +929,24 @@ $('#zin').onclick = () => { vs = { ...vs, zoom: Math.min(19, vs.zoom + 1), trans
 $('#zout').onclick = () => { vs = { ...vs, zoom: Math.max(11, vs.zoom - 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
 $('#zfit').onclick = () => { vs = { ...fitView(), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ initialViewState: vs }); };
 
-const onTheme = () => { readTokens(); update(); };
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', onTheme);
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
+const saved = store.get('curbwatch-theme');
+if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+function syncTheme() {
+  const dark = document.documentElement.dataset.theme ? document.documentElement.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const val = dark ? 'dark' : 'light';
+  if (document.documentElement.dataset.theme !== val) document.documentElement.dataset.theme = val;
+  const b = $('#theme');
+  b.setAttribute('aria-label', dark ? 'Switch to light theme' : 'Switch to dark theme');
+  b.title = dark ? 'Light theme' : 'Dark theme';
+}
+$('#theme').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next; store.set('curbwatch-theme', next); syncTheme();
+};
+syncTheme();
+const onTheme = () => { syncTheme(); readTokens(); update(); };
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!store.get('curbwatch-theme')) { delete document.documentElement.dataset.theme; onTheme(); } });
 new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
 $('#sources').innerHTML = `Sources: Dodgers home schedule (MLB Stats API), LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISO(C.permitRange[0])} 2025), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
