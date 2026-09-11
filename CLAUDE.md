@@ -6,8 +6,9 @@ the working document.
 
 Not deployed yet. Planned as a website (GitHub Pages like Greg's other sites), maybe an
 app later — `site.webmanifest` already makes it installable. Greg is designing the
-visual identity; the icons, `favicon.svg` and `og-image.png` are placeholders
-(`tools/make_images.py` regenerates them from the data).
+visual identity. `FAVICON.png` (512×512) is his and is the only icon — favicon,
+apple-touch-icon and manifest all point at it. `og-image.png` is still a placeholder
+(`tools/make_images.py` regenerates it from the data).
 
 ## Layout
 
@@ -28,7 +29,7 @@ and the `blocks` decode in `index.html` before changing either.
 - Replace `https://curbwatch.example/` with the real domain in `index.html` (canonical,
   `og:url`, `og:image`, `twitter:image`, JSON-LD), `robots.txt` and `sitemap.xml`.
   Add `CNAME` for Pages. See `quietbroadcast/CLAUDE.md` for the HTTPS/DNS ordering gotcha.
-- Swap in final icons and `og-image.png` (1200×630).
+- Swap in the final `og-image.png` (1200×630).
 - Page title/description live in `index.html` `<head>`; keep `og:`/`twitter:` copies in sync.
 
 ## Data decisions (hard-won — read before changing)

@@ -1,4 +1,4 @@
-"""Placeholder icons and share image. Replace with final artwork when the identity is designed."""
+"""Placeholder share image (og-image.png), drawn from the street data. Replace with final artwork when ready."""
 import json, math
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
@@ -6,28 +6,6 @@ from PIL import Image, ImageDraw, ImageFont
 ROOT = Path(__file__).resolve().parent.parent
 MOSS, PAPER, RED, STONE, INK = (78, 122, 82), (251, 250, 246), (224, 98, 90), (238, 234, 225), (42, 41, 38)
 
-
-def icon(size, pad=0.0, radius=0.235):
-    S = size * 8
-    im = Image.new('RGBA', (S, S), (0, 0, 0, 0)); d = ImageDraw.Draw(im)
-    inset = round(S * pad)
-    d.rounded_rectangle([inset, inset, S - inset, S - inset], radius=round((S - 2 * inset) * radius) if radius else 0, fill=MOSS)
-    c, r, w = S / 2, (S - 2 * inset) * 0.234, (S - 2 * inset) * 0.117
-    d.arc([c - r, c - r, c + r, c + r], 45, 315, fill=PAPER, width=round(w))
-    for a in (45, 315):
-        x, y = c + r * math.cos(math.radians(a)) - w / 2 * math.cos(math.radians(a)), c + r * math.sin(math.radians(a)) - w / 2 * math.sin(math.radians(a))
-        d.ellipse([x - w / 2, y - w / 2, x + w / 2, y + w / 2], fill=PAPER)
-    dr = (S - 2 * inset) * 0.07
-    d.ellipse([c + r * 0.87 - dr, c - dr, c + r * 0.87 + dr, c + dr], fill=RED)
-    return im.resize((size, size), Image.LANCZOS)
-
-
-icon(32).save(ROOT / 'favicon-32.png')
-icon(180, radius=0).convert('RGB').save(ROOT / 'apple-touch-icon.png')
-icon(192).save(ROOT / 'icon-192.png')
-icon(512).save(ROOT / 'icon-512.png')
-icon(512, pad=0.1, radius=0).save(ROOT / 'icon-maskable-512.png')
-Image.alpha_composite(Image.new('RGBA', (512, 512), MOSS + (255,)), icon(512, pad=0.1, radius=0)).save(ROOT / 'icon-maskable-512.png')
 
 # share image: the real street network, colored like the app
 C = json.loads((ROOT / 'curb-data.js').read_text()[len('window.CURB='):-1])
@@ -72,4 +50,4 @@ for i, line in enumerate(['Sweeping days, permit streets and', 'where tickets ge
 for i, col in enumerate([(200, 67, 59), (196, 143, 44), (78, 138, 90), (75, 111, 176), (138, 79, 163)]):
     d.rounded_rectangle([(74 + i * 46) * SS, 520 * SS, (110 + i * 46) * SS, 528 * SS], radius=4 * SS, fill=col)
 im.resize((W, H), Image.LANCZOS).save(ROOT / 'og-image.png', optimize=True)
-print('icons + og-image.png written')
+print('og-image.png written')
