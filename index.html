@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CurbWatch LA · Street parking rules from Echo Park to West Hollywood</title>
+<meta name="description" content="Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.">
+<link rel="canonical" href="https://curbwatch.example/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#EEEAE1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1C1B18" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CurbWatch LA">
+<meta property="og:title" content="CurbWatch LA">
+<meta property="og:description" content="Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.">
+<meta property="og:url" content="https://curbwatch.example/">
+<meta property="og:image" content="https://curbwatch.example/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="CurbWatch LA: a street map of Echo Park to West Hollywood colored by parking restrictions">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CurbWatch LA">
+<meta name="twitter:description" content="Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.">
+<meta name="twitter:image" content="https://curbwatch.example/og-image.png">
+<meta name="twitter:image:alt" content="CurbWatch LA: a street map of Echo Park to West Hollywood colored by parking restrictions">
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="apple-mobile-web-app-title" content="CurbWatch">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "CurbWatch LA",
+  "url": "https://curbwatch.example/",
+  "description": "Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.",
+  "applicationCategory": "TravelApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript and WebGL",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "areaServed": [
+    { "@type": "Place", "name": "Echo Park, Los Angeles" }, { "@type": "Place", "name": "Silver Lake, Los Angeles" },
+    { "@type": "Place", "name": "Los Feliz, Los Angeles" }, { "@type": "Place", "name": "Hollywood, Los Angeles" },
+    { "@type": "Place", "name": "Koreatown, Los Angeles" }, { "@type": "Place", "name": "West Hollywood, California" }
+  ],
+  "keywords": "Los Angeles street parking, street sweeping schedule, permit parking, Dodger Stadium parking, parking tickets, West Hollywood parking"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" href="curb-data.js" as="script">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500;9..144,600;9..144,700,100&family=Figtree:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --ground:#EEEAE1; --panel:#FBFAF6; --panel-2:#F1EEE6; --glass:rgba(251,250,246,.86); --ink:#2A2926; --ink-2:#6B675F; --ink-3:#9A958B; --line:#E2DDD1; --line-2:#EEE9DE;
+  --road-fwy:#D8D2C5; --road-major:#FFFFFF; --road-minor:#F9F7F2; --park:#D5DDC3; --water:#C4D5DC; --label:#5A564E; --label-halo:#EEEAE1;
+  --flock:#8A4FA3; --red:#C8433B; --amber:#C48F2C; --green:#4E8A5A; --blue:#4B6FB0; --unpainted:#B9B3A6; --other:#A39D91; --orange:#D6702F; --moss:#4E7A52;
+  --focus:#4E7A52; --shadow:0 1px 2px rgba(42,41,38,.06),0 12px 40px rgba(42,41,38,.14);
+  --sign-bg:#FCFBF6; --sign-red:#B9302C; --sign-green:#2E6B44; --sign-blue:#2C55A8;
+  --f-display:"Fraunces",Georgia,"Times New Roman",serif; --f-ui:"Figtree","Helvetica Neue",Arial,system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#1C1B18; --panel:#26241F; --panel-2:#2F2C26; --glass:rgba(38,36,31,.88); --ink:#EDE9DF; --ink-2:#A9A497; --ink-3:#7D786C; --line:#3B3831; --line-2:#332F29;
+  --road-fwy:#42403A; --road-major:#37352F; --road-minor:#2B2A25; --park:#26301F; --water:#1F2E36; --label:#B7B1A3; --label-halo:#1C1B18;
+  --red:#E0625A; --amber:#E0A945; --green:#6FB07A; --blue:#7E9BD8; --unpainted:#6E695E; --other:#8B857A; --orange:#E98A4A; --moss:#7FB08A; --flock:#C392D8;
+  --focus:#7FB08A; --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 44px rgba(0,0,0,.5);
+  --sign-bg:#F4F1E8; --sign-red:#B9302C; --sign-green:#2E6B44; --sign-blue:#2C55A8;
+}}
+:root[data-theme="dark"]{
+  --ground:#1C1B18; --panel:#26241F; --panel-2:#2F2C26; --glass:rgba(38,36,31,.88); --ink:#EDE9DF; --ink-2:#A9A497; --ink-3:#7D786C; --line:#3B3831; --line-2:#332F29;
+  --road-fwy:#42403A; --road-major:#37352F; --road-minor:#2B2A25; --park:#26301F; --water:#1F2E36; --label:#B7B1A3; --label-halo:#1C1B18;
+  --red:#E0625A; --amber:#E0A945; --green:#6FB07A; --blue:#7E9BD8; --unpainted:#6E695E; --other:#8B857A; --orange:#E98A4A; --moss:#7FB08A; --flock:#C392D8;
+  --focus:#7FB08A; --shadow:0 1px 2px rgba(0,0,0,.4),0 14px 44px rgba(0,0,0,.5);
+  --sign-bg:#F4F1E8; --sign-red:#B9302C; --sign-green:#2E6B44; --sign-blue:#2C55A8;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:14.5px/1.45 var(--f-ui);-webkit-font-smoothing:antialiased;overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+#map{position:fixed;inset:0}
+.panel{position:fixed;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);z-index:2}
+#rail{top:16px;left:16px;width:324px;max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;padding:6px 0}
+#detail{top:16px;right:16px;width:384px;max-height:calc(100dvh - 32px);overflow:auto;padding:6px 0}
+#detail[hidden]{display:none}
+.sec{padding:14px 20px;display:flex;flex-direction:column;gap:10px}
+.sec+.sec{border-top:1px solid var(--line-2)}
+.brand h1{margin:0;font:600 30px/1 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 60;letter-spacing:-.01em}
+.brand h1 span{color:var(--moss)}
+.brand p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.45}
+.lbl{font:600 11.5px/1 var(--f-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.search{position:relative}
+.search input{width:100%;height:42px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:0 14px 0 38px;font-size:15px;transition:border-color .15s}
+.search input:hover{border-color:var(--ink-3)}
+.search svg{position:absolute;left:14px;top:13px;width:16px;height:16px;stroke:var(--ink-3);fill:none;stroke-width:1.8}
+.sugg{position:absolute;left:6px;right:6px;top:46px;background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;z-index:5;padding:4px}
+.sugg button{display:block;width:100%;text-align:left;background:none;border:0;padding:8px 12px;cursor:pointer;border-radius:9px}
+.sugg button:hover,.sugg button.on{background:var(--panel-2)}
+.sugg small{color:var(--ink-3);margin-left:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid transparent;background:var(--panel-2);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--ink-2);transition:background .15s,color .15s}
+.chip:hover{color:var(--ink);background:var(--line)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.winsum{font:600 22px/1.1 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 40}
+.gamenote{font-size:12.5px;color:var(--ink-2);line-height:1.4}
+.gamenote.on{color:var(--ink);background:color-mix(in srgb,var(--red) 12%,transparent);border-left:3px solid var(--red);padding:7px 10px;border-radius:10px}
+.win{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.win label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}
+.win input{height:34px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:0 8px;font-size:13px;min-width:0;color-scheme:light dark}
+.tabs{display:flex;gap:4px;background:var(--panel-2);border-radius:999px;padding:3px}
+.tabs button{flex:1;border:0;background:none;padding:6px 0;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2);transition:background .15s,color .15s}
+.tabs button[aria-pressed="true"]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.legend{display:flex;flex-direction:column;gap:7px;font-size:13px}
+.lg{display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:9px}
+.lg i{height:6px;border-radius:3px;display:block}
+.lg b{font-weight:500}
+.lg em{font-style:normal;color:var(--ink-3);font-variant-numeric:tabular-nums;font-size:12px}
+.subopts{display:flex;flex-wrap:wrap;gap:6px}
+.subopts:empty{display:none}
+.toggles{display:flex;flex-wrap:wrap;gap:6px}
+.tg{display:inline-flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;border-radius:999px;padding:5px 12px 5px 9px;background:var(--panel-2);color:var(--ink-2);transition:background .15s,color .15s}
+.tg:has(input:checked){background:var(--ink);color:var(--panel)}
+.tg input{position:absolute;opacity:0;width:0;height:0}
+.tg .dot{width:9px;height:9px;border-radius:50%}
+.tg .cam{width:10px;height:10px;border-radius:50%;background:var(--flock);box-shadow:0 0 0 2px color-mix(in srgb,var(--flock) 35%,transparent)}
+.tg .psq{font:800 10px/14px var(--f-ui);width:14px;text-align:center;border-radius:3px;color:#fff;background:var(--sign-blue)}
+.fine{font-size:12px;color:var(--ink-3);line-height:1.5}
+.note{font-size:13px;color:var(--ink-2)}
+details.src summary{cursor:pointer;font-size:12px;color:var(--ink-3);list-style:none}
+details.src summary::-webkit-details-marker{display:none}
+details.src summary::after{content:" ↓";opacity:.7}
+details.src[open] summary::after{content:" ↑"}
+details.src p{margin:6px 0 0}
+/* detail */
+.dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.dhead h2{margin:0;font:600 26px/1.05 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 40;text-wrap:balance;letter-spacing:-.01em}
+.dhead p{margin:5px 0 0;color:var(--ink-2);font-size:13px}
+.x{border:0;background:var(--panel-2);width:30px;height:30px;border-radius:50%;cursor:pointer;flex:none;font-size:18px;line-height:1;color:var(--ink-2)}
+.x:hover{background:var(--line)}
+.verdict{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:14px;border-left:4px solid}
+.verdict b{font:600 17px/1.15 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 30}
+.verdict span{font-size:13px;color:var(--ink-2)}
+.signs{display:flex;flex-direction:column;gap:12px}
+.sign{background:var(--sign-bg);color:var(--sign-red);border-radius:10px;padding:5px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 3px 10px rgba(0,0,0,.08)}
+.sign .in{border:1.5px solid currentColor;border-radius:7px;padding:9px 10px 8px;text-align:center;font-family:var(--f-ui);text-transform:uppercase;line-height:1.05;letter-spacing:.02em}
+.sign.g{color:var(--sign-green)} .sign.b{color:var(--sign-blue)} .sign.k{color:#3B3A36}
+.sign .big{font-weight:800;font-size:20px}
+.sign .mid{font-weight:700;font-size:15px;margin-top:5px}
+.sign .sm{font-weight:600;font-size:11.5px;margin-top:5px;letter-spacing:.05em;opacity:.9}
+.sign .tag{display:inline-block;margin-top:7px;padding:3px 8px;border-radius:4px;background:currentColor}
+.sign .tag span{color:var(--sign-bg);font-weight:800;font-size:11px;letter-spacing:.07em}
+.smeta{font-size:12.5px;color:var(--ink-2);margin:6px 4px 0;display:flex;flex-wrap:wrap;gap:3px 10px}
+.smeta .hit{color:var(--red);font-weight:600}
+.smeta .ok{color:var(--green);font-weight:600}
+.h3{font:600 16px/1.2 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 30;margin:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.cats{display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-size:13px;font-variant-numeric:tabular-nums}
+.cats .k{display:flex;align-items:center;gap:7px}
+.cats .k i{width:9px;height:9px;border-radius:50%;flex:none}
+.cats .n{text-align:right;font-weight:600}
+.cats .f{text-align:right;color:var(--ink-3)}
+.list{display:flex;flex-direction:column;gap:2px}
+.li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:8px 10px;border:0;border-radius:12px;font-size:13.5px;background:none;text-align:left;cursor:pointer;width:100%;color:var(--ink)}
+.li:hover{background:var(--panel-2)}
+.li .p{font:800 12px/18px var(--f-ui);width:18px;text-align:center;border-radius:4px;color:#fff;background:var(--sign-blue);margin-top:1px}
+.li .p.o{background:#5C6478}.li .p.c{background:#8B9098}
+.li small{display:block;color:var(--ink-2);font-size:12.5px;line-height:1.4}
+.li .d{color:var(--ink-3);font-variant-numeric:tabular-nums;white-space:nowrap}
+.li .cm{width:18px;height:18px;border-radius:50%;background:var(--flock);margin-top:1px;box-shadow:inset 0 0 0 5px color-mix(in srgb,var(--panel) 80%,transparent)}
+.li .cm.o{background:var(--ink-3)}
+.li a{color:inherit}
+.mgrid{display:flex;flex-wrap:wrap;gap:3px}
+.mgrid i{width:11px;height:11px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line)}
+.mgrid i.v{background:var(--green);border-color:var(--green)}
+.mgrid i.o{background:var(--ink-3);border-color:var(--ink-3)}
+.zoom{position:fixed;right:16px;bottom:30px;display:flex;flex-direction:column;z-index:1;border-radius:999px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(14px)}
+.zoom button{width:38px;height:38px;border:0;background:none;cursor:pointer;font-size:18px;color:var(--ink-2)}
+.zoom button:hover{color:var(--ink)}
+.attr{position:fixed;left:16px;bottom:8px;font-size:11px;color:var(--ink-3);z-index:1;pointer-events:none}
+.deck-tooltip{font:13px/1.35 var(--f-ui)!important}
+.railtoggle{display:none}
+@media (max-width:760px){
+  #rail{left:8px;right:8px;top:8px;width:auto;max-height:52dvh}
+  #rail.collapsed .more{display:none}
+  .railtoggle{display:inline-block}
+  .brand{display:flex;align-items:center;justify-content:space-between}
+  #detail{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:56dvh}
+  .zoom{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="map" aria-label="Parking map"></div>
+
+<aside id="rail" class="panel collapsed">
+  <div class="sec">
+    <div class="brand">
+      <h1>CurbWatch <span>LA</span></h1>
+      <button class="chip railtoggle" id="railToggle" aria-expanded="false">Options</button>
+    </div>
+    <p class="brand-p note" style="margin:0">Echo Park to West Hollywood. Search an address, or click a block, to see what its signs say and who gets ticketed there.</p>
+    <div class="search">
+      <svg viewBox="0 0 16 16"><circle cx="7" cy="7" r="5"/><path d="M11 11l3.5 3.5"/></svg>
+      <input id="q" type="search" placeholder="Search an address" autocomplete="off" aria-label="Search an address or street">
+      <div class="sugg" id="sugg" hidden></div>
+    </div>
+    <div class="chips" id="saved"></div>
+  </div>
+  <div class="sec more">
+    <div class="lbl">When you’re parking</div>
+    <div class="winsum" id="winsum"></div>
+    <div class="gamenote" id="gamenote"></div>
+    <div class="win">
+      <label>Arriving<input type="datetime-local" id="t0" step="900"></label>
+      <label>Leaving<input type="datetime-local" id="t1" step="900"></label>
+    </div>
+    <div class="chips" id="presets">
+      <button class="chip" data-p="now">Now, 2 hrs</button>
+      <button class="chip" data-p="tonight">Tonight</button>
+      <button class="chip" data-p="overnight">Overnight</button>
+      <button class="chip" data-p="tomorrow">Tomorrow 9–5</button>
+    </div>
+  </div>
+  <div class="sec more">
+    <div class="lbl">Streets colored by</div>
+    <div class="tabs" id="mode" role="group" aria-label="Street coloring">
+      <button data-m="window" aria-pressed="true">Window</button>
+      <button data-m="tickets" aria-pressed="false">Tickets</button>
+      <button data-m="sweep" aria-pressed="false">Sweeping</button>
+      <button data-m="permit" aria-pressed="false">Permits</button>
+    </div>
+    <div class="subopts" id="subopts"></div>
+    <div class="legend" id="legend"></div>
+    <div class="toggles">
+      <label class="tg"><input type="checkbox" id="showMeters" checked><span class="dot" style="background:var(--green)"></span>Meters</label>
+      <label class="tg"><input type="checkbox" id="showLots" checked><span class="psq">P</span>Garages &amp; lots</label>
+      <label class="tg"><input type="checkbox" id="showDistricts"><span class="dot" style="background:var(--blue)"></span>WeHo permit districts</label>
+      <label class="tg"><input type="checkbox" id="showAlpr" checked><span class="cam"></span>Flock cameras</label>
+    </div>
+  </div>
+  <div class="sec more">
+    <p class="fine" style="margin:0">Drawn from city data, not the curb itself: red curbs, hydrants, driveways and temporary signs aren’t mapped, and the posted sign always wins. LA hasn’t published its permit-district map since 2015, so LA permit streets appear only where permit tickets were written at that block’s own address; holidays suspend LA sweeping.</p>
+    <details class="src"><summary>Sources</summary><p class="fine" id="sources"></p></details>
+    <span id="meterNote" hidden></span>
+  </div>
+</aside>
+
+<aside id="detail" class="panel" hidden aria-live="polite"></aside>
+
+<div class="zoom"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button><button id="zfit" aria-label="Show whole area" style="font-size:13px">⤢</button></div>
+<div class="attr">Streets © OpenStreetMap contributors</div>
+
+<noscript><p style="position:fixed;inset:auto 16px 16px;z-index:9;background:var(--panel);padding:12px 16px;border-radius:12px">CurbWatch LA draws its map with JavaScript. Turn it on to see sweeping days, permit streets and ticket history for any block.</p></noscript>
+
+<script src="https://cdn.jsdelivr.net/npm/deck.gl@9.1.14/dist.min.js"></script>
+<script src="curb-data.js"></script>
+<script>
+(() => {
+const C = window.CURB, O = [C.meta.lon0, C.meta.lat0];
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KX = Math.cos(34.08 * Math.PI / 180) * 111320, KY = 110574;
+
+function dec(a, s = 0) { let x = 0, y = 0; const o = []; for (let i = s; i < a.length; i += 2) { x += a[i]; y += a[i + 1]; o.push([O[0] + x / 1e5, O[1] + y / 1e5]); } return o; }
+const P = p => [O[0] + p[0] / 1e5, O[1] + p[1] / 1e5];
+
+// ---------- decode
+const roads = C.roads.map(r => ({ c: r[0], path: dec(r, 1) }));
+const labels = C.labels.map(l => ({ pos: P(l), a: l[2], c: l[3], t: l[4], len: l[5] }));
+const green = C.green.map(g => ({ k: g[0], poly: dec(g, 1) }));
+const wehoOutline = C.weho.map(r => dec(r));
+const routes = C.routes.map(r => ({ code: r[0], mask: r[1], t0: r[2], t1: r[3], wk: r[4], bounds: r[5] }));
+const ppd = C.ppd.map(p => ({ id: p[0], poly: dec(p, 1) }));
+const wehoDistricts = C.wehoDistricts.map(p => ({ id: p[0], poly: dec(p, 1) }));
+const blocks = C.blocks.map((b, i) => {
+  const path = dec(b[9]);
+  return { i, name: b[0], lo: b[1], hi: b[2], len: Math.max(b[3], 10), routes: b[4], ppd: b[5], nmet: b[6], cit: b[7], top: b[8], path, lvl: 0, kind: 'la', ev: { zone: b[10][0], g: b[10][1], o: b[10][2] },
+    perm: b[11] ? { n: b[11][0], opd: b[11][1], hrs: b[11][2], last: b[11][3] } : null };
+});
+const permHit = b => !!(b.perm && b.pwh >= 3 && b.pwh >= 0.05 * (b.perm.n + b.perm.opd));
+const isPermit = b => !!(b.ppd.length || (b.perm && (b.perm.n >= 3 || b.perm.opd >= 3)));
+function permSpan(h) {
+  const tot = h.reduce((a, c) => a + c, 0); if (tot < 3) return null;
+  let bs = 0, bl = 24;
+  for (let st = 0; st < 24; st++) { let acc = 0; for (let l = 1; l <= 24; l++) { acc += h[(st + l - 1) % 24]; if (acc >= tot * .9) { if (l < bl) { bl = l; bs = st; } break; } } }
+  return [bs, (bs + bl) % 24, tot];
+}
+const wehoPermit = C.wehoPermit.map(w => ({ name: w[0], dist: w[1], hrs: w[2], rules: w[3], path: dec(w[4]), kind: 'wp', lvl: 0 }));
+const wehoSweep = C.wehoSweep.map(w => ({ zone: w[0], mask: w[1], t0: w[2], t1: w[3], day: w[4], path: dec(w[5]), kind: 'ws', lvl: 0 }));
+const meters = C.meters.map(m => ({ pos: P(m), rate: C.rates[m[2]], lim: C.limits[m[3]], multi: m[4], face: C.faces[m[5]], id: m[6], st: m[7], age: m[8], rt: m[9] }));
+const lots = C.lots.map(l => ({ ...l, pos: P(l.p) }));
+let occTime = C.occTime, occLive = false;
+const alpr = C.alpr.map(a => ({ pos: P(a), flock: !!a[2], dirs: a[3], mfr: a[4], op: a[5], id: a[6] }));
+const CONE = 38, HALF = 24;
+const cones = alpr.flatMap(a => a.dirs.map(d => {
+  const pts = [a.pos];
+  for (let k = -HALF; k <= HALF; k += 8) { const r = (d + k) * Math.PI / 180; pts.push([a.pos[0] + Math.sin(r) * CONE / (Math.cos(34.08 * Math.PI / 180) * 111320), a.pos[1] + Math.cos(r) * CONE / 110574]); }
+  return { a, poly: pts };
+}));
+const compass = d => ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.round(d / 45) % 8];
+
+// addresses
+const streets = C.addr.map(([key, f]) => {
+  const n = f.length / 3, nums = new Int32Array(n), xs = new Float64Array(n), ys = new Float64Array(n);
+  let a = 0, x = 0, y = 0;
+  for (let i = 0; i < n; i++) { a += f[i * 3]; x += f[i * 3 + 1]; y += f[i * 3 + 2]; nums[i] = a; xs[i] = O[0] + x / 1e5; ys[i] = O[1] + y / 1e5; }
+  const base = key.replace(/^(N|S|E|W) /, '');
+  return { key, base, nums, xs, ys };
+});
+
+// ---------- geometry helpers
+const toM = (lon, lat) => [(lon + 118.3) * KX, (lat - 34.08) * KY];
+function segDist(p, a, b) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], L = dx * dx + dy * dy;
+  let t = L ? ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L : 0; t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy);
+}
+function pathDist(pm, path) {
+  let d = Infinity;
+  for (let i = 1; i < path.length; i++) d = Math.min(d, segDist(pm, toM(...path[i - 1]), toM(...path[i])));
+  return d;
+}
+function inPoly(pt, poly) {
+  let c = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i], [xj, yj] = poly[j];
+    if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < (xj - xi) * (pt[1] - yi) / (yj - yi) + xi) c = !c;
+  }
+  return c;
+}
+const CELL = 0.002;
+function gridOf(items, getPts) {
+  const g = new Map();
+  items.forEach((it, i) => {
+    const seen = new Set();
+    for (const [x, y] of getPts(it)) {
+      const k = Math.floor(x / CELL) + ':' + Math.floor(y / CELL);
+      if (seen.has(k)) continue; seen.add(k);
+      (g.get(k) || g.set(k, []).get(k)).push(i);
+    }
+  });
+  return g;
+}
+function densify(path) {
+  const o = [];
+  for (let i = 0; i < path.length; i++) {
+    o.push(path[i]);
+    if (i < path.length - 1) { const [a, b] = [path[i], path[i + 1]]; const n = Math.ceil(Math.max(Math.abs(b[0] - a[0]), Math.abs(b[1] - a[1])) / (CELL / 2)); for (let k = 1; k < n; k++) o.push([a[0] + (b[0] - a[0]) * k / n, a[1] + (b[1] - a[1]) * k / n]); }
+  }
+  return o;
+}
+function near(grid, items, lon, lat, r = 1) {
+  const cx = Math.floor(lon / CELL), cy = Math.floor(lat / CELL), out = new Set();
+  for (let dx = -r; dx <= r; dx++) for (let dy = -r; dy <= r; dy++) (grid.get((cx + dx) + ':' + (cy + dy)) || []).forEach(i => out.add(i));
+  return [...out].map(i => items[i]);
+}
+const gBlocks = gridOf(blocks, b => densify(b.path));
+const gWP = gridOf(wehoPermit, w => densify(w.path));
+const gWS = gridOf(wehoSweep, w => densify(w.path));
+const gMet = gridOf(meters, m => [m.pos]);
+const addrPts = []; streets.forEach((s, si) => { for (let i = 0; i < s.nums.length; i++) addrPts.push([si, i]); });
+const gAddr = gridOf(addrPts, ([si, i]) => [[streets[si].xs[i], streets[si].ys[i]]]);
+
+// ---------- time (wall-clock LA, stored as fake-UTC ms)
+const DAY = 864e5, MIN = 6e4;
+const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DOW3 = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+function laNow() {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date()).map(x => [x.type, x.value]));
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute);
+}
+const toInput = t => new Date(t).toISOString().slice(0, 16);
+const fromInput = s => { const m = s.match(/(\d+)-(\d+)-(\d+)T(\d+):(\d+)/); return m ? Date.UTC(+m[1], m[2] - 1, +m[3], +m[4], +m[5]) : NaN; };
+const dayStart = t => Math.floor(t / DAY) * DAY;
+function fmtMin(m) {
+  m = ((m % 1440) + 1440) % 1440; const h = Math.floor(m / 60), mm = m % 60;
+  if (m === 0) return 'Midnight'; if (m === 720) return 'Noon';
+  return (h % 12 || 12) + (mm ? ':' + String(mm).padStart(2, '0') : '') + (h < 12 ? ' AM' : ' PM');
+}
+const fmtT = t => fmtMin(Math.round((t - dayStart(t)) / MIN));
+const fmtD = t => { const d = new Date(t); return DOW3[d.getUTCDay()] + ' ' + MON[d.getUTCMonth()] + ' ' + d.getUTCDate(); };
+const ord = n => n + (['th', 'st', 'nd', 'rd'][n] || 'th');
+
+// rule occurrences: mask of weekdays, [t0,t1) minutes, optional month-weeks mask
+function occurrences(r, from, to, cb) {
+  for (let d = dayStart(from) - DAY; d <= to; d += DAY) {
+    const dt = new Date(d), dow = dt.getUTCDay();
+    if (!(r.mask & (1 << dow))) continue;
+    if (r.wk) { const nth = Math.floor((dt.getUTCDate() - 1) / 7) + 1; if (nth > 4 || !(r.wk & (1 << (nth - 1)))) continue; }
+    const s = d + r.t0 * MIN, e = d + (r.t1 > r.t0 ? r.t1 : r.t1 + 1440) * MIN;
+    if (e > from && s < to && cb(s, e) === false) return;
+  }
+}
+function overlaps(r, a, b) { let hit = null; occurrences(r, a, b, (s, e) => { hit = [s, e]; return false; }); return hit; }
+function nextOcc(r, from, days = 70) { let hit = null; occurrences(r, from, from + days * DAY, (s, e) => { hit = [s, e]; return false; }); return hit; }
+const PRE = 4 * 36e5, POST = 3.5 * 36e5;
+const games = C.games.map(([t, opp, type]) => ({ t: fromInput(t), opp, type }));
+const gameIn = (a, b) => games.find(g => g.t - PRE < b && g.t + POST > a) || null;
+const nextGame = a => games.find(g => g.t + POST > a) || null;
+const permitRule = r => ({ mask: r[1], t0: r[2], t1: r[3] === 1440 && r[2] === 0 ? 1440 : r[3] });
+
+// ---------- state
+const S = { t0: 0, t1: 0, mode: 'window', tcat: -1, tAll: false, sel: null, showMeters: true, showLots: true, showDistricts: false, showAlpr: true };
+let slotMask = new Uint8Array(168);
+let routeHit = [], wsHit = [], wpHit = [];
+let viewZoom = 13;
+
+let winHours = new Uint8Array(24);
+function computeWindow() {
+  const a = S.t0, b = Math.max(S.t1, S.t0 + 15 * MIN);
+  slotMask = new Uint8Array(168);
+  if (b - a >= 7 * DAY) slotMask.fill(1);
+  else for (let t = Math.floor(a / 36e5) * 36e5; t < b; t += 36e5) { const d = new Date(t); slotMask[d.getUTCDay() * 24 + d.getUTCHours()] = 1; }
+  winHours = new Uint8Array(24); for (let k = 0; k < 168; k++) if (slotMask[k]) winHours[k % 24] = 1;
+  routeHit = routes.map(r => overlaps(r, a, b));
+  wsHit = wehoSweep.map(w => overlaps(w, a, b));
+  S.game = gameIn(a, b);
+  wpHit = wehoPermit.map(w => {
+    const res = { permit: null, limit: null };
+    for (const r of w.rules) { const h = overlaps(permitRule(r), a, b); if (h) res[r[0] === 'permit' ? 'permit' : 'limit'] = res[r[0] === 'permit' ? 'permit' : 'limit'] || h; }
+    return res;
+  });
+  for (const bl of blocks) {
+    const w = [0, 0, 0, 0, 0], all = [0, 0, 0, 0, 0];
+    for (let i = 0; i < bl.cit.length; i += 2) { const k = bl.cit[i], n = bl.cit[i + 1], c = Math.floor(k / 168); all[c] += n; if (slotMask[k % 168]) w[c] += n; }
+    bl.win = w; bl.all = all;
+    bl.pwh = bl.perm ? bl.perm.hrs.reduce((acc, n, h) => acc + (winHours[h] ? n : 0), 0) : 0;
+    bl.sweepHit = bl.routes.some(r => routeHit[r]);
+    bl.evHit = !!(bl.ev.zone && S.game);
+    let nx = null; for (const r of bl.routes) { const o = nextOcc(routes[r], a); if (o && (!nx || o[0] < nx[0])) nx = o; }
+    bl.next = nx;
+  }
+}
+
+// ---------- colors from CSS tokens
+let T = {};
+function readTokens() {
+  const cs = getComputedStyle(document.documentElement);
+  const hex = n => { const v = cs.getPropertyValue('--' + n).trim(); const m = v.match(/^#([0-9a-f]{6})$/i); return m ? [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4), 16)] : [128, 128, 128]; };
+  for (const n of ['ground', 'panel', 'ink', 'ink-2', 'ink-3', 'road-fwy', 'road-major', 'road-minor', 'park', 'water', 'label', 'label-halo', 'red', 'amber', 'green', 'blue', 'unpainted', 'other', 'orange', 'line', 'flock']) T[n] = hex(n);
+  T.dark = (T.ground[0] + T.ground[1] + T.ground[2]) < 200;
+}
+const A = (c, a) => [c[0], c[1], c[2], Math.round(a * 255)];
+const CAT = [
+  { k: 'Street cleaning', c: () => T.red },
+  { k: 'Permit / overnight', c: () => T.blue },
+  { k: 'Meter & time limit', c: () => T.green },
+  { k: 'Red zone & no stopping', c: () => T.orange },
+  { k: 'Everything else', c: () => T.other },
+];
+
+// ---------- per-mode levels & colors
+function ticketVal(b) {
+  const src = S.tAll ? b.all : b.win;
+  const n = S.tcat < 0 ? src[0] + src[1] + src[2] + src[3] + src[4] : src[S.tcat];
+  return n / b.len * 100;
+}
+let tBreaks = [1, 3, 8];
+function classify() {
+  const a = S.t0;
+  if (S.mode === 'tickets') {
+    const vals = blocks.map(ticketVal).filter(v => v > 0).sort((x, y) => x - y);
+    const qn = p => vals.length ? vals[Math.min(vals.length - 1, Math.floor(p * vals.length))] : 1;
+    tBreaks = [qn(.5), qn(.8), qn(.95)];
+  }
+  for (const b of blocks) {
+    if (S.mode === 'window') {
+      const busy = b.win[0] + b.win[1] + b.win[2] + b.win[3], pm = isPermit(b) && !b.ev.zone;
+      b.lvl = b.sweepHit || b.evHit ? 5 : (pm && permHit(b)) ? 4 : ((pm && b.perm) || (busy >= 3 && busy / b.len * 100 >= 2)) ? 3 : b.nmet ? 2 : 1;
+    } else if (S.mode === 'tickets') {
+      const v = ticketVal(b); b.lvl = v <= 0 ? 0 : v < tBreaks[0] ? 1 : v < tBreaks[1] ? 2 : v < tBreaks[2] ? 3 : 4;
+    } else if (S.mode === 'sweep') {
+      b.lvl = !b.routes.length ? 0 : b.sweepHit ? 5 : !b.next ? 1 : b.next[0] - a < DAY ? 4 : b.next[0] - a < 3 * DAY ? 3 : 2;
+    } else {
+      b.lvl = b.ev.zone ? (b.evHit ? 3 : 2) : !isPermit(b) ? 0 : permHit(b) ? 3 : b.perm && b.perm.n + b.perm.opd >= 3 ? 2 : 1;
+    }
+  }
+  wehoSweep.forEach((w, i) => {
+    const nx = nextOcc(w, a);
+    w.next = nx;
+    w.lvl = S.mode === 'window' ? (wsHit[i] ? 5 : 1) : S.mode === 'sweep' ? (wsHit[i] ? 5 : !nx ? 1 : nx[0] - a < DAY ? 4 : nx[0] - a < 3 * DAY ? 3 : 2) : 0;
+  });
+  wehoPermit.forEach((w, i) => {
+    const h = wpHit[i];
+    w.lvl = S.mode === 'window' ? (h.permit ? 4 : h.limit && (S.t1 - S.t0) > 2 * 36e5 ? 3 : 1) : S.mode === 'permit' ? (h.permit ? 3 : 1) : 0;
+  });
+}
+function colorFor(it) {
+  const L = it.lvl;
+  if (S.mode === 'window') return [null, A(T.unpainted, T.dark ? .38 : .55), A(T.green, .9), A(T.amber, .95), A(T.blue, .95), A(T.red, 1)][L] || [0, 0, 0, 0];
+  if (S.mode === 'tickets') {
+    const r = T.red, lo = T.dark ? [90, 60, 62] : [236, 180, 170];
+    const mix = t => [0, 1, 2].map(j => Math.round(lo[j] + (r[j] - lo[j]) * t));
+    return [[0, 0, 0, 0], A(mix(0), .75), A(mix(.35), .85), A(mix(.7), .95), A(mix(1), 1)][L];
+  }
+  if (S.mode === 'sweep') return [[0, 0, 0, 0], A(T.unpainted, T.dark ? .3 : .5), A(T.green, .75), A(T.amber, .9), A(T.orange, 1), A(T.red, 1)][L];
+  return [[0, 0, 0, 0], A(T.blue, .35), A(T.blue, .65), A(T.blue, 1)][L];
+}
+
+// ---------- deck
+let deckgl, fontReady = false;
+const hoods = [['Echo Park', -118.2605, 34.0785], ['Silver Lake', -118.2705, 34.0905], ['Los Feliz', -118.2925, 34.1085], ['East Hollywood', -118.2985, 34.0915],
+  ['Hollywood', -118.3285, 34.1005], ['West Hollywood', -118.3705, 34.0905], ['Fairfax', -118.3615, 34.0785], ['Hancock Park', -118.3295, 34.0675],
+  ['Koreatown', -118.3015, 34.0605], ['Westlake', -118.2745, 34.0575], ['Angelino Heights', -118.2505, 34.0705], ['Larchmont', -118.3235, 34.0775],
+  ['Mid-Wilshire', -118.3455, 34.0605], ['Beverly Grove', -118.3775, 34.0745], ['Virgil Village', -118.2875, 34.0805], ['Elysian Park', -118.2415, 34.0835]];
+
+const RW = [22, 15, 12, 10, 7];
+const roadsMinor = roads.filter(r => r.c > 2), roadsMajor = roads.filter(r => r.c <= 2).sort((a, b) => b.c - a.c);
+function layers() {
+  const z = viewZoom, D = deck;
+  const roadCol = c => c === 0 ? T['road-fwy'] : c <= 2 ? T['road-major'] : T['road-minor'];
+  const overlay = [...blocks, ...wehoSweep, ...wehoPermit].filter(b => b.lvl > 0).sort((a, b) => a.lvl - b.lvl);
+  const selPath = S.sel && S.sel.hl ? S.sel.hl : [];
+  const L = [
+    new D.SolidPolygonLayer({ id: 'green', data: green, getPolygon: d => d.poly, getFillColor: d => d.k ? T.water : T.park, updateTriggers: { getFillColor: T.ground } }),
+    new D.PolygonLayer({ id: 'districts', data: [...ppd.map(p => ({ ...p, w: 0 })), ...wehoDistricts.map(p => ({ ...p, w: 1 }))], visible: S.showDistricts || S.mode === 'permit',
+      getPolygon: d => d.poly, filled: true, stroked: true, getFillColor: A(T.blue, S.mode === 'permit' ? .06 : .05), getLineColor: A(T.blue, .55), lineWidthMinPixels: 1, getLineWidth: 2,
+      updateTriggers: { getFillColor: [T.blue, S.mode], getLineColor: T.blue } }),
+    new D.PathLayer({ id: 'roads-minor', data: roadsMinor, getPath: d => d.path, getColor: d => roadCol(d.c), getWidth: d => RW[d.c], widthUnits: 'meters', widthMinPixels: .7,
+      capRounded: true, jointRounded: true, updateTriggers: { getColor: T.ground } }),
+    new D.PathLayer({ id: 'roads-major', data: roadsMajor, getPath: d => d.path, getColor: d => roadCol(d.c), getWidth: d => RW[d.c], widthUnits: 'meters', widthMinPixels: 1.6,
+      capRounded: true, jointRounded: true, updateTriggers: { getColor: T.ground } }),
+    new D.PathLayer({ id: 'weho-line', data: wehoOutline, getPath: d => d, getColor: A(T['ink-3'], .7), getWidth: 1.4, widthUnits: 'pixels', getDashArray: [4, 3],
+      updateTriggers: { getColor: T.ground } }),
+    new D.PathLayer({ id: 'overlay', data: overlay, getPath: d => d.path, getColor: colorFor, getWidth: 7, widthUnits: 'meters', widthMinPixels: z < 13 ? 1.2 : 1.8, widthMaxPixels: 9,
+      capRounded: true, jointRounded: true, pickable: true, autoHighlight: true, highlightColor: A(T.ink, .35),
+      updateTriggers: { getColor: [S.mode, S.t0, S.t1, S.tcat, S.tAll, T.ground] } }),
+    new D.PathLayer({ id: 'sel-line', data: selPath, getPath: d => d, getColor: A(T.ink, .9), getWidth: 12, widthUnits: 'meters', widthMinPixels: 4, capRounded: true, jointRounded: true }),
+    new D.ScatterplotLayer({ id: 'meters', data: meters, visible: S.showMeters && z >= 14.5, getPosition: d => d.pos, radiusUnits: 'meters', getRadius: 2.6, radiusMinPixels: z >= 16 ? 3 : 2,
+      getFillColor: d => d.st === 2 && d.age < 240 ? T.green : d.st === 1 && d.age < 240 ? A(T.ink, .45) : A(T.green, .55), stroked: true, getLineColor: A(T.ground, 1), lineWidthMinPixels: .8,
+      pickable: true, updateTriggers: { getFillColor: [T.ground, occTime] } }),
+    new D.SolidPolygonLayer({ id: 'alpr-cones', data: cones, visible: S.showAlpr && z >= 14.5, getPolygon: d => d.poly, getFillColor: d => A(d.a.flock ? T.flock : T['ink-3'], .22), updateTriggers: { getFillColor: T.ground } }),
+    new D.ScatterplotLayer({ id: 'alpr', data: alpr, visible: S.showAlpr, getPosition: d => d.pos, radiusUnits: 'pixels', getRadius: d => (d.flock ? 4.5 : 3.5) * (z >= 15 ? 1.2 : 1),
+      getFillColor: d => d.flock ? T.flock : A(T['ink-3'], .9), stroked: true, getLineColor: A(T.panel, 1), lineWidthUnits: 'pixels', getLineWidth: 1.5, pickable: true,
+      updateTriggers: { getFillColor: T.ground, getLineColor: T.ground, getRadius: z >= 15 } }),
+    new D.ScatterplotLayer({ id: 'pin', data: S.sel ? [S.sel.pt] : [], getPosition: d => d, radiusUnits: 'pixels', getRadius: 7, getFillColor: T.ink, stroked: true, getLineColor: T.ground, lineWidthMinPixels: 2.5 }),
+  ];
+  if (fontReady) {
+    const lbls = labels.filter(l => z >= 15 || (z >= 13.4 && l.c <= 2) || (l.c <= 1 && z >= 12.5));
+    L.push(new D.TextLayer({ id: 'labels', data: lbls, getPosition: d => d.pos, getText: d => d.t, getAngle: d => d.a, getSize: d => d.c <= 2 ? 12.5 : 11.5, sizeUnits: 'pixels',
+      fontFamily: '"Figtree", sans-serif', fontWeight: 600, characterSet: 'auto', getColor: T.label, fontSettings: { sdf: true, fontSize: 48, buffer: 6 }, outlineWidth: 4, outlineColor: A(T['label-halo'], .95),
+      extensions: [new D.CollisionFilterExtension()], collisionEnabled: true, getCollisionPriority: d => (4 - d.c) * 1000 + Math.min(d.len, 999), collisionTestProps: { sizeScale: 2.2 },
+      updateTriggers: { getColor: T.ground } }));
+    L.push(new D.TextLayer({ id: 'hoods', data: hoods, visible: z < 15.2, getPosition: d => [d[1], d[2]], getText: d => d[0], getSize: 15, fontFamily: '"Fraunces", serif', fontWeight: 600,
+      characterSet: 'auto', getColor: A(T.ink, T.dark ? .55 : .5), fontSettings: { sdf: true, fontSize: 64, buffer: 8 }, outlineWidth: 5, outlineColor: A(T.ground, .9), getLetterSpacing: 0,
+      updateTriggers: { getColor: T.ground } }));
+    const lotData = lots.filter(l => S.showLots && (l.k === 'city' ? z >= 12.8 : z >= 15));
+    L.push(new D.TextLayer({ id: 'lots', data: lotData, getPosition: d => d.pos, getText: () => 'P', getSize: d => d.k === 'city' ? 13 : 11, fontFamily: '"Figtree", sans-serif', fontWeight: 800,
+      characterSet: ['P'], getColor: [255, 255, 255], background: true, getBackgroundColor: d => d.k === 'city' ? [27, 79, 184] : d.acc === 'customers' ? [122, 130, 138] : [63, 74, 90],
+      backgroundPadding: [4, 1, 4, 1], backgroundBorderRadius: 3, pickable: true }));
+  }
+  return L;
+}
+const redraw = () => deckgl && deckgl.setProps({ layers: layers() });
+
+function tooltip({ object, layer }) {
+  if (!object || !layer) return null;
+  const st = { background: getComputedStyle(document.documentElement).getPropertyValue('--panel'), color: getComputedStyle(document.documentElement).getPropertyValue('--ink'), border: '1px solid ' + getComputedStyle(document.documentElement).getPropertyValue('--line'), borderRadius: '6px', padding: '6px 9px', maxWidth: '260px' };
+  if (layer.id === 'meters') return { html: `<b>${esc(object.lim.replace('HR', ' hr').replace('MIN', ' min'))} · ${esc(object.rate)}</b><br>${esc(object.face)}<br><span style="opacity:.7">Space ${esc(object.id)}${object.st ? ' · ' + (['', 'Occupied', 'Open', 'Unknown'][object.st]) + (object.age ? ` ${ago(object.age)}` : '') : ''}</span>`, style: st };
+  if (layer.id === 'alpr') return { html: `<b>${object.flock ? 'Flock plate reader' : 'Plate reader'}</b>${object.mfr && !object.flock ? ' · ' + esc(object.mfr) : ''}<br><span style="opacity:.7">${object.dirs.length ? 'Faces ' + object.dirs.map(compass).join(' & ') : 'Direction not mapped'}${object.op ? ' · ' + esc(object.op) : ''}</span>`, style: st };
+  if (layer.id === 'lots') return { html: `<b>${esc(object.n || (object.k === 'garage' ? 'Parking garage' : 'Parking lot'))}</b><br><span style="opacity:.7">${esc(lotLine(object))}</span>`, style: st };
+  if (layer.id === 'overlay') {
+    if (object.kind === 'la') return { html: `<b>${esc(blockTitle(object))}</b><br><span style="opacity:.75">${esc(lvlText(object))}</span>`, style: st };
+    if (object.kind === 'wp') return { html: `<b>${esc(title(object.name))}</b><br><span style="opacity:.75">District ${esc(object.dist)} · ${esc(object.hrs)}</span>`, style: st };
+    if (object.kind === 'ws') return { html: `<b>West Hollywood sweeping</b><br><span style="opacity:.75">${esc(object.day)} ${fmtMin(object.t0)}–${fmtMin(object.t1)}</span>`, style: st };
+  }
+  return null;
+}
+function ago(min) { const m = Math.max(0, Math.round(min + (Date.now() - occFetched) / MIN)); return m < 60 ? m + ' min ago' : m < 1440 ? Math.round(m / 60) + ' hr ago' : Math.round(m / 1440) + ' days ago'; }
+let occFetched = Date.now();
+function lvlText(b) {
+  if (S.mode === 'tickets') { const n = S.tAll ? b.all : b.win; return `${n.reduce((a, c) => a + c, 0)} tickets ${S.tAll ? 'in 6 months' : 'at these hours in 6 months'}`; }
+  if (S.mode === 'sweep') return b.next ? `Next sweep ${fmtD(b.next[0])} ${fmtT(b.next[0])}` : 'No posted sweeping';
+  if (S.mode === 'permit') return b.ev.zone ? 'District D (Dodger events)' : !isPermit(b) ? '' : `${b.perm.n + b.perm.opd} permit tickets written here in 18 mo`;
+  if (b.evHit) return 'Dodger game restriction in your window';
+  return ['', 'No published rule in your window', 'Metered', 'Check signs', 'Permit enforced at these hours', 'Street cleaning in your window'][b.lvl];
+}
+
+// ---------- naming
+const SUF = { STREET: 'ST', AVENUE: 'AVE', AV: 'AVE', BOULEVARD: 'BLVD', BL: 'BLVD', DRIVE: 'DR', PLACE: 'PL', ROAD: 'RD', TERRACE: 'TER', COURT: 'CT', LANE: 'LN', CIRCLE: 'CIR', WAY: 'WY', PARKWAY: 'PKWY', TRAIL: 'TRL', NORTH: 'N', SOUTH: 'S', EAST: 'E', WEST: 'W', SAINT: 'ST' };
+const norm = s => s.toUpperCase().replace(/[.,#]/g, ' ').replace(/\s+/g, ' ').trim().split(' ').map((w, i, arr) => (w === 'SAINT' && i < arr.length - 1) ? 'ST' : (SUF[w] && !(w === 'SAINT')) ? SUF[w] : w).join(' ');
+function title(s) {
+  return s.toLowerCase().replace(/\b([a-z])/g, c => c.toUpperCase()).replace(/\b(\d+)(St|Nd|Rd|Th)\b/g, (m, n, s) => n + s.toLowerCase()).replace(/\bWy\b/, 'Way').replace(/\bMc([a-z])/g, (m, c) => 'Mc' + c.toUpperCase());
+}
+function blockTitle(b) { return b.lo ? `${title(b.name)} · ${Math.floor(b.lo / 100) * 100} block` : title(b.name); }
+
+// ---------- geocode
+function geocode(input) {
+  const m = input.trim().match(/^(\d+)(?:[a-z]\b|\s+1\/2)?\s+(.+)$/i);
+  const num = m ? +m[1] : null, rest = norm(m ? m[2] : input).replace(/ (LOS ANGELES|LA|CA|WEST HOLLYWOOD|WEHO)\b.*$/, '').replace(/ \d{5}$/, '');
+  if (!rest) return null;
+  const restBase = rest.replace(/^(N|S|E|W) /, '');
+  const tiers = new Map();
+  for (const s of streets) {
+    const sc = s.key === rest ? 5 : s.base === restBase && s.key.startsWith(rest.split(' ')[0]) ? 4.5 : s.base === rest ? 4 : s.base === restBase ? 3.5 : s.base.split(' ').slice(0, -1).join(' ') === restBase ? 3 : s.base.startsWith(restBase + ' ') ? 2 : 0;
+    if (sc) (tiers.get(sc) || tiers.set(sc, []).get(sc)).push(s);
+  }
+  if (!tiers.size) return null;
+  const order = [...tiers.keys()].sort((a, b) => b - a);
+  if (num == null) { const s = tiers.get(order[0]).sort((a, b) => b.nums.length - a.nums.length)[0], i = Math.floor(s.nums.length / 2); return { pt: [s.xs[i], s.ys[i]], label: title(s.key), street: s }; }
+  let hit = null, hd = Infinity;
+  for (const t of order) {
+    for (const s of tiers.get(t)) {
+      for (let i = 0; i < s.nums.length; i++) {
+        const d = Math.abs(s.nums[i] - num) + ((s.nums[i] - num) % 2 ? 0.5 : 0);
+        if (d < hd) { hd = d; hit = { s, i }; }
+      }
+    }
+    if (hit && hd <= 400) break;
+  }
+  if (!hit || hd > 400) return null;
+  const { s, i } = hit;
+  return { pt: [s.xs[i], s.ys[i]], label: (hd === 0 ? num : s.nums[i]) + ' ' + title(s.key), exact: hd === 0, street: s, num: s.nums[i] };
+}
+function suggestions(input) {
+  const m = input.trim().match(/^(\d+)?\s*(.*)$/); const num = m[1], rest = norm(m[2] || '');
+  if (rest.length < 2) return [];
+  const rb = rest.replace(/^(N|S|E|W) /, '');
+  return streets.filter(s => s.base.startsWith(rb) || s.key.startsWith(rest)).sort((a, b) => b.nums.length - a.nums.length).slice(0, 6)
+    .map(s => ({ text: (num ? num + ' ' : '') + title(s.key), n: s.nums.length, range: s.nums[0] + '–' + s.nums[s.nums.length - 1] }));
+}
+function nearestAddr(lon, lat) {
+  const pm = toM(lon, lat); let best = null, bd = 45;
+  for (const [si, i] of near(gAddr, addrPts, lon, lat)) { const s = streets[si]; const d = Math.hypot(...[0, 1].map(j => toM(s.xs[i], s.ys[i])[j] - pm[j])); if (d < bd) { bd = d; best = s.nums[i] + ' ' + title(s.key); } }
+  return best;
+}
+
+// ---------- location query + detail panel
+function query(lon, lat, label, hint) {
+  const pm = toM(lon, lat);
+  const cand = near(gBlocks, blocks, lon, lat, 2).map(b => [b, pathDist(pm, b.path)]);
+  let nb = cand.filter(x => x[1] < 40).sort((a, b) => a[1] - b[1]);
+  if (hint) {
+    const same = cand.filter(([b, d]) => d < 130 && b.name.replace(/^(N|S|E|W) /, '') === hint.base).sort((a, b) => a[1] - b[1]);
+    const inRange = same.filter(([b]) => b.lo <= hint.num && hint.num <= b.hi && (b.lo % 2 === hint.num % 2 || b.hi - b.lo > 3));
+    const pick = inRange[0] || same[0];
+    if (pick) nb = [[pick[0], 0], ...nb];
+  }
+  const block = nb.length ? nb[0][0] : null;
+  let wp = near(gWP, wehoPermit, lon, lat, 2).map(w => [w, pathDist(pm, w.path)]);
+  if (hint) { const m = wp.filter(([w, d]) => d < 110 && norm(w.name).includes(hint.base)); const nums = w => (w.name.match(/^(\d+)-(\d+)/) || []).slice(1).map(Number); const r = m.filter(([w]) => { const [lo, hi] = nums(w); return lo <= hint.num && hint.num <= hi && lo % 2 === hint.num % 2; }); wp = (r.length ? r : m); }
+  else wp = wp.filter(x => x[1] < 30);
+  wp = wp.sort((a, b) => a[1] - b[1]).map(x => x[0]);
+  const ws = near(gWS, wehoSweep, lon, lat).map(w => [w, pathDist(pm, w.path)]).filter(x => x[1] < 30).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+  const inWeho = wehoOutline.some(r => inPoly([lon, lat], r));
+  const mets = near(gMet, meters, lon, lat).map(m => [m, Math.hypot(toM(...m.pos)[0] - pm[0], toM(...m.pos)[1] - pm[1])]).filter(x => x[1] < 70).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+  const lotsNear = lots.map(l => [l, Math.hypot(toM(...l.pos)[0] - pm[0], toM(...l.pos)[1] - pm[1])]).filter(x => x[1] < 650).sort((a, b) => (a[1] - (a[0].k === 'city' ? 150 : 0)) - (b[1] - (b[0].k === 'city' ? 150 : 0))).slice(0, 5);
+  const cams = alpr.map(c => [c, Math.hypot(toM(...c.pos)[0] - pm[0], toM(...c.pos)[1] - pm[1])]).filter(x => x[1] < 400).sort((a, b) => a[1] - b[1]).slice(0, 6);
+  let ppdIds = block ? block.ppd : [];
+  if (!block && !inWeho) ppdIds = ppd.filter(p => inPoly([lon, lat], p.poly)).map(p => p.id);
+  const wDist = wehoDistricts.filter(d => inPoly([lon, lat], d.poly)).map(d => d.id);
+  const lbl = label || nearestAddr(lon, lat) || (block ? blockTitle(block) : 'Dropped pin');
+  const useBlock = block && !inWeho;
+  const hl = [];
+  if (useBlock) hl.push(block.path);
+  wp.slice(0, 1).forEach(w => hl.push(w.path));
+  S.sel = { pt: [lon, lat], hl, block: useBlock ? block : null, wp: wp.slice(0, 2), ws: ws.slice(0, 2), inWeho, mets, lots: lotsNear, cams, ppd: [...new Set(ppdIds)], wDist, label: lbl };
+  renderDetail(); redraw();
+}
+
+function signSweep(rs, weekly) {
+  const groups = new Map();
+  for (const r of rs) { const k = r.t0 + '-' + r.t1 + '-' + (r.wk || 0); (groups.get(k) || groups.set(k, []).get(k)).push(r); }
+  return [...groups.values()].map(g => {
+    const days = [...new Set(g.flatMap(r => DOW.filter((d, i) => r.mask & (1 << i))))].sort((x, y) => DOW.indexOf(x) - DOW.indexOf(y));
+    const dayTxt = days.length === 5 && !days.includes('Sunday') && !days.includes('Saturday') ? 'Mon thru Fri' : days.length === 7 ? 'Daily' : days.length === 2 && g.length === 2 ? days.join(' / ') : days.join(' · ');
+    const wk = g[0].wk; const wkTxt = wk ? [1, 2, 3, 4].filter(n => wk & (1 << (n - 1))).map(ord).join(' & ') + ' of the month' : weekly ? 'Every week' : 'Every week';
+    const sides = g.length === 2 && days.length === 2 ? `<div class="sm">${esc(days[0].slice(0, 3))} one side · ${esc(days[1].slice(0, 3))} the other</div>` : '';
+    const a = S.t0, b = Math.max(S.t1, S.t0 + 15 * MIN);
+    const hits = g.map(r => overlaps(r, a, b)).filter(Boolean);
+    const nexts = g.map(r => nextOcc(r, a)).filter(Boolean).sort((x, y) => x[0] - y[0]);
+    const meta = [hits.length ? `<span class="hit">Hits your window: ${fmtD(hits[0][0])} ${fmtT(hits[0][0])}</span>` : `<span class="ok">Clear of your window</span>`,
+      nexts.length ? `<span>Next: ${nexts.slice(0, 2).map(n => fmtD(n[0])).join(', ')}</span>` : '', g[0].code ? `<span>Route ${esc(g.map(r => r.code).join(' / '))}</span>` : ''].filter(Boolean);
+    return { hit: hits.length > 0, html: `<div><div class="sign"><div class="in"><div class="big">No parking</div><div class="mid">${fmtMin(g[0].t0)} to ${fmtMin(g[0].t1)}</div><div class="mid">${esc(dayTxt)}</div>${sides}<div class="sm">${esc(wkTxt)}</div><div class="tag"><span>Street cleaning</span></div></div></div><div class="smeta">${meta.join('')}</div></div>` };
+  });
+}
+function hourSpan(block, cat) {
+  const h = new Array(24).fill(0);
+  for (let i = 0; i < block.cit.length; i += 2) { const k = block.cit[i]; if (Math.floor(k / 168) === cat) h[(k % 168) % 24] += block.cit[i + 1]; }
+  const tot = h.reduce((a, b) => a + b, 0); if (tot < 3) return null;
+  let bestS = 0, bestL = 24;
+  for (let s = 0; s < 24; s++) { let acc = 0; for (let l = 1; l <= 24; l++) { acc += h[(s + l - 1) % 24]; if (acc >= tot * .85) { if (l < bestL) { bestL = l; bestS = s; } break; } } }
+  return [bestS, (bestS + bestL) % 24, tot];
+}
+function chartSVG(block) {
+  const H = Array.from({ length: 24 }, () => [0, 0, 0, 0, 0]);
+  for (let i = 0; i < block.cit.length; i += 2) { const k = block.cit[i]; H[(k % 168) % 24][Math.floor(k / 168)] += block.cit[i + 1]; }
+  const tot = H.map(r => r.reduce((a, b) => a + b, 0)), mx = Math.max(1, ...tot);
+  const W = 300, h = 70, bw = W / 24;
+  const win = new Array(24).fill(0); for (let s = 0; s < 168; s++) if (slotMask[s]) win[s % 24] = 1;
+  let g = '';
+  for (let i = 0; i < 24; i++) if (win[i]) g += `<rect x="${i * bw}" y="0" width="${bw}" height="${h}" fill="var(--ink)" opacity=".07"/>`;
+  g += `<line x1="0" x2="${W}" y1="${h}" y2="${h}" stroke="var(--line)"/>`;
+  for (let i = 0; i < 24; i++) {
+    let y = h;
+    H[i].forEach((n, c) => { if (!n) return; const bh = n / mx * (h - 4); y -= bh; g += `<rect x="${i * bw + 1.2}" y="${y}" width="${bw - 2.4}" height="${bh}" fill="var(--${['red', 'blue', 'green', 'orange', 'other'][c]})"/>`; });
+  }
+  [[0, '12a'], [6, '6a'], [12, '12p'], [18, '6p']].forEach(([i, t]) => g += `<text x="${i * bw + 1}" y="${h + 13}" font-size="10" fill="var(--ink-3)" font-family="Figtree, sans-serif">${t}</text>`);
+  g += `<text x="${W}" y="9" font-size="10" text-anchor="end" fill="var(--ink-3)" font-family="Figtree, sans-serif">${mx} max / hr</text>`;
+  return `<svg viewBox="0 -2 ${W} ${h + 18}" role="img" aria-label="Tickets by hour of day">${g}</svg>`;
+}
+function lotLine(l) {
+  if (l.src === 'LADOT') return [l.a, l.r && l.r !== 'See Special Features' ? l.r : '', l.d ? l.d + ' max' : '', l.h].filter(Boolean).join(' · ');
+  if (l.src === 'WeHo') return [l.a, l.s ? l.s + ' spaces' : '', 'City of West Hollywood'].filter(Boolean).join(' · ');
+  return [l.k === 'garage' ? 'Garage' : 'Lot', l.acc === 'customers' ? 'customers only' : l.acc === 'yes' ? 'public' : '', l.fee === 'yes' ? 'paid' : l.fee === 'no' ? 'free' : '', l.s ? l.s + ' spaces' : '', l.h].filter(Boolean).join(' · ');
+}
+function renderDetail() {
+  const s = S.sel, el = $('#detail'); if (!s) { el.hidden = true; return; }
+  const b = s.block, a = S.t0, e = Math.max(S.t1, S.t0 + 15 * MIN);
+  const signs = []; let hitSweep = false, hitPermit = false, caution = [];
+  if (b && b.routes.length) signSweep(b.routes.map(i => routes[i])).forEach(x => { signs.push(x.html); hitSweep ||= x.hit; });
+  if (s.ws.length) signSweep(s.ws.map(w => ({ ...w, code: '' })), true).forEach(x => { signs.push(x.html); hitSweep ||= x.hit; });
+  let hitEvent = false;
+  if (b && b.ev.zone) {
+    const g = S.game, nx = nextGame(S.t0);
+    hitEvent = !!g;
+    signs.unshift(`<div><div class="sign"><div class="in"><div class="big">No parking</div><div class="mid">4 hours before &amp; during</div><div class="mid">events at Dodger Stadium</div><div class="tag"><span>District D permits exempt</span></div>${b.ev.zone === 2 ? '<div class="sm">Inferred from game-day tickets · check the posted sign</div>' : ''}</div></div>
+      <div class="smeta">${g ? `<span class="hit">Dodgers vs ${esc(g.opp)} ${fmtD(g.t)} ${fmtT(g.t)} · restricted from ${fmtT(g.t - PRE)}</span>` : `<span class="ok">No home game in your window</span>${nx ? `<span>Next: ${fmtD(nx.t)} ${fmtT(nx.t)} vs ${esc(nx.opp)}</span>` : ''}`}
+      ${b.ev.g ? `<span>${b.ev.g} no-parking tickets here on game days in 6 mo${b.ev.o ? `, ${b.ev.o} on other days` : ''}</span>` : ''}<span>Concerts and other stadium events count too</span></div></div>`);
+  }
+  for (const w of s.wp.slice(0, 1)) {
+    const perm = w.rules.filter(r => r[0] === 'permit'), lim = w.rules.filter(r => r[0] === '2hr');
+    const dayT = m => m === 127 ? 'Everyday' : m === 0b1111110 ? 'Mon–Sat' : m === 0b0111110 ? 'Mon–Fri' : m === 0b1000001 ? 'Sat & Sun' : m === 1 ? 'Sunday' : '';
+    const rng = r => r[2] === 0 && r[3] === 1440 ? 'Anytime' : `${fmtMin(r[2])} to ${fmtMin(r[3])}`;
+    const h = wpHit[wehoPermit.indexOf(w)];
+    if (lim.length) signs.push(`<div><div class="sign g"><div class="in"><div class="big">${lim[0][2] === 0 && lim[0][3] === 1440 ? '2 hour parking' : '2 hour parking'}</div>${lim.map(r => `<div class="mid">${rng(r)} ${dayT(r[1])}</div>`).join('')}<div class="sm">Except district ${esc(w.dist)} permits</div></div></div></div>`);
+    if (perm.length) signs.push(`<div><div class="sign g"><div class="in"><div class="big">Permit parking only</div>${perm.map(r => `<div class="mid">${rng(r)} ${dayT(r[1])}</div>`).join('')}<div class="tag"><span>District ${esc(w.dist)}</span></div></div></div><div class="smeta">${h.permit ? `<span class="hit">Permit-only during your window</span>` : `<span class="ok">Not permit-only in your window</span>`}<span>${esc(title(w.name))}</span></div></div>`);
+    hitPermit ||= !!h.permit; if (h.limit && e - a > 2 * 36e5) caution.push('2-hour limit applies for part of your stay');
+  }
+  if (!s.wp.length && s.wDist.length && s.inWeho) signs.push(`<div><div class="sign g"><div class="in"><div class="big">Permit district ${esc(s.wDist.join(', '))}</div><div class="sm">This block isn’t in WeHo’s published permit list · read the posted sign</div></div></div></div>`);
+  if (!s.inWeho && b && isPermit(b) && !b.ev.zone) {
+    const pr = b.perm, span = permSpan(pr.hrs), pw = b.pwh;
+    const overnight = pr.opd >= 3 && pr.opd >= pr.n;
+    signs.push(`<div><div class="sign g"><div class="in"><div class="big">${overnight ? 'Overnight permit parking' : 'Permit parking'}</div>${span ? `<div class="mid">Ticketed ${fmtMin(span[0] * 60)} to ${fmtMin(span[1] * 60)}</div>` : ''}<div class="sm">District permits exempt · exact hours on the posted sign</div></div></div>
+      <div class="smeta"><span>${pr.n + pr.opd} permit tickets written on this block since ${fmtISO(C.permitRange[0])} 2025, last ${fmtISO(pr.last)}</span>${permHit(b) ? `<span class="hit">${pw} written at your hours</span>` : pw ? `<span>Only ${pw} at your hours (${Math.round(pw / (pr.n + pr.opd) * 100)}%)</span>` : '<span class="ok">None at your hours</span>'}</div></div>`);
+    if (permHit(b)) hitPermit = true; else caution.push('Permit street, enforced at other hours');
+  }
+  if (s.mets.length) {
+    const lim = [...new Set(s.mets.map(m => m.lim))], rate = [...new Set(s.mets.map(m => m.rate))];
+    const sensed = s.mets.filter(m => m.st && m.age < 240), open = sensed.filter(m => m.st === 2);
+    const span = b ? hourSpan(b, 2) : null, mw = b ? b.win[2] : 0;
+    signs.push(`<div><div class="sign g"><div class="in"><div class="big">${esc(lim.slice(0, 2).map(l => l.replace('HR', ' HR').replace('MIN', ' MIN').replace('-', ' / ')).join(' · '))} parking</div><div class="mid">Meter · ${esc(rate.slice(0, 2).join(' · '))}${rate.some(r => r.includes('-')) ? ' by time of day' : '/hr'}</div><div class="sm">${s.mets.length} space${s.mets.length > 1 ? 's' : ''} within 70 m · ${esc(s.mets[0].face)}</div></div></div>
+      <div class="smeta">${sensed.length ? `<span class="${open.length ? 'ok' : ''}">${open.length} of ${sensed.length} sensed spaces open</span><span>${occLive ? 'live' : 'sensor snapshot'} ${fmtStamp(occTime)}</span>` : '<span>No occupancy sensors here</span>'}
+      ${span ? `<span>Meter tickets: ${fmtMin(span[0] * 60)}–${fmtMin(span[1] * 60)}</span>` : ''}${b && b.nmet ? (mw ? `<span>${mw} meter tickets at your hours</span>` : `<span class="ok">No meter tickets at your hours in 6 mo</span>`) : ''}</div>
+      ${sensed.length ? `<div class="mgrid" style="margin-top:6px" aria-label="Sensed spaces">${sensed.slice(0, 40).map(m => `<i class="${m.st === 2 ? 'v' : 'o'}" title="${esc(m.id)}"></i>`).join('')}</div>` : ''}</div>`);
+  }
+  if (!signs.length) signs.push(`<div><div class="sign k"><div class="in"><div class="mid">No posted rules in city data</div><div class="sm">No sweeping route, permit district or meter mapped here</div></div></div></div>`);
+  if (b) { const busy = b.win[0] + b.win[1] + b.win[2] + b.win[3]; if (busy >= 3 && busy / b.len * 100 >= 2) caution.push(`${busy} tickets written on this block at these hours in 6 months`); }
+  const winTxt = winLabel();
+  let v;
+  if (hitEvent) v = [T.red, 'Dodger game during your window', 'Only District D permit holders can park here from 4 hours before first pitch until the game ends.'];
+  else if (hitSweep) v = [T.red, 'Street cleaning in your window', 'Move the car before the posted time, or park elsewhere.'];
+  else if (hitPermit) v = [T.blue, 'Permit only in your window', s.inWeho ? 'Without a district permit you’ll be cited.' : 'Permit tickets are written here at these hours.'];
+  else if (caution.length) v = [T.amber, 'Check the signs', caution.join(' · ')];
+  else if (s.mets.length) v = [T.green, 'Metered parking', 'Nothing else published conflicts with your window.'];
+  else v = [T.unpainted, 'No published conflict', 'Nothing in city data restricts this spot in your window. Posted signs still win.'];
+  const cityTxt = s.inWeho ? 'West Hollywood' : 'City of Los Angeles';
+  const tot = b ? b.all.reduce((x, y) => x + y, 0) : 0;
+  const fineOf = v => C.fines[v];
+  const lotsHTML = s.lots.map(([l, d]) => `<button class="li" data-lot="${lots.indexOf(l)}"><span class="p ${l.k === 'city' ? '' : l.acc === 'customers' ? 'c' : 'o'}">P</span><span>${esc(l.n || (l.k === 'garage' ? 'Parking garage' : 'Parking lot'))}<small>${esc(lotLine(l))}${l.src === 'LADOT' && l.sf ? ' · ' + esc(l.sf.slice(0, 110)) + (l.sf.length > 110 ? '…' : '') : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('');
+  el.innerHTML = `
+    <div class="sec">
+      <div class="dhead"><div><h2>${esc(s.label)}</h2><p>${esc(b ? blockTitle(b) + ' · ' : '')}${cityTxt}</p></div><button class="x" id="close" aria-label="Close">×</button></div>
+      <div class="verdict" style="border-color:rgb(${v[0].join(',')});background:rgba(${v[0].join(',')},.10)"><b>${esc(v[1])}</b><span>${esc(winTxt)} · ${esc(v[2])}</span></div>
+    </div>
+    <div class="sec"><div class="lbl">What the signs say</div><div class="signs">${signs.join('')}</div></div>
+    ${b ? `<div class="sec"><h3 class="h3">${tot} ticket${tot === 1 ? '' : 's'} on this block since ${fmtISO(C.citeRange[0])}</h3>
+      ${tot ? `<div class="chart">${chartSVG(b)}</div><div class="cats">${CAT.map((c, i) => b.all[i] ? `<span class="k"><i style="background:rgb(${c.c().join(',')})"></i>${c.k}</span><span class="n">${b.all[i]}</span><span class="f">${b.win[i] ? b.win[i] + ' at your hours' : ''}</span>` : '').join('')}</div>
+      <div class="fine">Most written: ${b.top.slice(0, 3).map(([v, n]) => `${esc(title(v))} ×${n}${fineOf(v) ? ` ($${fineOf(v)})` : ''}`).join(' · ')}. Shaded columns are your window’s hours.</div>` : '<div class="note">No citations recorded on this block in six months.</div>'}</div>` : (s.inWeho ? '<div class="sec"><div class="note">Ticket history covers LA City only; West Hollywood doesn’t publish citations.</div></div>' : '')}
+    ${lotsHTML ? `<div class="sec"><div class="lbl">Off-street nearby</div><div class="list">${lotsHTML}</div></div>` : ''}
+    ${S.showAlpr ? `<div class="sec"><div class="lbl">Plate readers within 400 m</div>${s.cams.length ? `<div class="list">${s.cams.map(([c, d]) => `<button class="li" data-cam="${alpr.indexOf(c)}"><span class="cm ${c.flock ? '' : 'o'}"></span><span>${c.flock ? 'Flock Safety' : esc(c.mfr || 'Unknown maker')}<small>${c.dirs.length ? 'Faces ' + c.dirs.map(compass).join(' & ') : 'Direction not mapped'}${c.op ? ' · ' + esc(c.op) : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('')}</div>` : '<div class="note">None mapped nearby.</div>'}
+      <div class="fine">Community-mapped in OpenStreetMap, the same data DeFlock shows, so coverage is incomplete.</div></div>` : ''}`;
+  el.hidden = false;
+  $('#close').onclick = () => { S.sel = null; el.hidden = true; redraw(); };
+  el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
+  el.querySelectorAll('[data-lot]').forEach(n => n.onclick = () => { const l = lots[+n.dataset.lot]; fly(l.pos, 17); });
+}
+const fmtISO = s => { const [y, m, d] = s.split('-').map(Number); return MON[m - 1] + ' ' + d; };
+function fmtStamp(iso) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(iso.slice(0, 19) + 'Z')).map(x => [x.type, x.value]));
+  const t = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute); return fmtD(t) + ', ' + fmtT(t);
+}
+function winLabel() {
+  const a = S.t0, b = S.t1, same = dayStart(a) === dayStart(b) || (b - dayStart(a) <= DAY && fmtT(b) === 'Midnight');
+  const today = dayStart(laNow()), dn = d => d === today ? 'Today' : d === today + DAY ? 'Tomorrow' : fmtD(d);
+  return same ? `${dn(dayStart(a))} ${fmtT(a)}–${fmtT(b)}` : `${dn(dayStart(a))} ${fmtT(a)} → ${dn(dayStart(b))} ${fmtT(b)}`;
+}
+
+// ---------- rail UI
+function renderLegend() {
+  const cnt = f => blocks.filter(f).length;
+  let items = [], sub = '';
+  if (S.mode === 'window') {
+    items = [[T.red, S.game ? 'Street cleaning or Dodger game restriction' : 'Street cleaning during your window', cnt(b => b.lvl === 5)], [T.blue, 'Permit tickets written at these hours', cnt(b => b.lvl === 4)],
+      [T.amber, 'Permit street (other hours) or heavy ticketing', cnt(b => b.lvl === 3)], [T.green, 'Metered', cnt(b => b.lvl === 2)], [A(T.unpainted, 1), 'No published rule', cnt(b => b.lvl === 1)]];
+  } else if (S.mode === 'tickets') {
+    const r = T.red, lo = T.dark ? [90, 60, 62] : [236, 180, 170], mix = t => [0, 1, 2].map(j => Math.round(lo[j] + (r[j] - lo[j]) * t));
+    const f = v => v < 10 ? v.toFixed(1) : Math.round(v);
+    items = [[mix(1), `${f(tBreaks[2])}+ per 100 m`, cnt(b => b.lvl === 4)], [mix(.7), `${f(tBreaks[1])}–${f(tBreaks[2])}`, cnt(b => b.lvl === 3)], [mix(.35), `${f(tBreaks[0])}–${f(tBreaks[1])}`, cnt(b => b.lvl === 2)], [mix(0), `under ${f(tBreaks[0])}`, cnt(b => b.lvl === 1)]];
+    sub = `<button class="chip" data-tc="-1" aria-pressed="${S.tcat < 0}">All</button>` + CAT.slice(0, 4).map((c, i) => `<button class="chip" data-tc="${i}" aria-pressed="${S.tcat === i}">${c.k.split(' ')[0] === 'Red' ? 'Red zone' : c.k.split(' ')[0]}</button>`).join('') +
+      `<label class="tg" style="font-size:13px;width:100%"><input type="checkbox" id="tAll" ${S.tAll ? 'checked' : ''}>All hours, not just your window’s</label>`;
+  } else if (S.mode === 'sweep') {
+    items = [[T.red, 'Swept during your window', cnt(b => b.lvl === 5)], [T.orange, 'Within 24 hrs of arriving', cnt(b => b.lvl === 4)], [T.amber, 'Within 3 days', cnt(b => b.lvl === 3)], [T.green, 'Later', cnt(b => b.lvl === 2)]];
+  } else {
+    items = [[T.blue, 'Permit tickets at these hours', cnt(b => b.lvl === 3)], [A(T.blue, .65), 'Permit tickets at other hours', cnt(b => b.lvl === 2)]];
+  }
+  $('#subopts').innerHTML = sub;
+  $('#legend').innerHTML = items.map(([c, t, n]) => `<div class="lg"><i style="background:rgba(${c[0]},${c[1]},${c[2]},${c[3] != null ? c[3] / 255 : 1})"></i><b>${t}</b><em>${n.toLocaleString()} blocks</em></div>`).join('') +
+    (S.mode === 'tickets' ? `<div class="fine">${S.tAll ? 'All' : 'Written during your window’s weekday-hours,'} ${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}. LA City only.</div>` : S.mode === 'window' ? '<div class="fine">West Hollywood blocks use the city’s own permit and sweeping schedules.</div>' : '');
+  $('#subopts').querySelectorAll('[data-tc]').forEach(n => n.onclick = () => { S.tcat = +n.dataset.tc; update(); });
+  const ta = $('#tAll'); if (ta) ta.onchange = () => { S.tAll = ta.checked; update(); };
+}
+function update() {
+  computeWindow(); classify(); renderLegend();
+  $('#winsum').textContent = winLabel();
+  const ng = S.game || nextGame(S.t0);
+  $('#gamenote').innerHTML = S.game ? `<b>Dodgers home vs ${esc(S.game.opp)}</b> · ${fmtD(S.game.t)}, ${fmtT(S.game.t)}. District D streets are permit-only from ${fmtT(S.game.t - PRE)}.`
+    : ng ? `No Dodgers home game in this window. Next: ${fmtD(ng.t)}, ${fmtT(ng.t)} vs ${esc(ng.opp)}.` : '';
+  $('#gamenote').classList.toggle('on', !!S.game);
+  if (S.sel) renderDetail();
+  redraw();
+}
+function setWindow(a, b) { S.t0 = a; S.t1 = Math.max(b, a + 15 * MIN); $('#t0').value = toInput(S.t0); $('#t1').value = toInput(S.t1); update(); }
+function preset(p) {
+  const now = laNow(), today = dayStart(now);
+  if (p === 'now') setWindow(Math.floor(now / (15 * MIN)) * 15 * MIN, Math.floor(now / (15 * MIN)) * 15 * MIN + 2 * 36e5);
+  if (p === 'tonight') { const d = now > today + 21.5 * 36e5 ? today + DAY : today; setWindow(d + 20 * 36e5, d + 22 * 36e5); }
+  if (p === 'overnight') { const d = now > today + 22 * 36e5 ? today + DAY : today; setWindow(d + 19 * 36e5, d + DAY + 9 * 36e5); }
+  if (p === 'tomorrow') setWindow(today + DAY + 9 * 36e5, today + DAY + 17 * 36e5);
+}
+$('#presets').onclick = e => { const p = e.target.dataset.p; if (p) preset(p); };
+$('#t0').onchange = () => { const a = fromInput($('#t0').value); if (!isNaN(a)) setWindow(a, S.t1 > a ? S.t1 : a + 2 * 36e5); };
+$('#t1').onchange = () => { const b = fromInput($('#t1').value); if (!isNaN(b)) setWindow(S.t0, b > S.t0 ? b : S.t0 + 2 * 36e5); };
+$('#mode').onclick = e => { const m = e.target.dataset.m; if (!m) return; S.mode = m; $('#mode').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === m)); update(); };
+$('#showMeters').onchange = e => { S.showMeters = e.target.checked; redraw(); };
+$('#showLots').onchange = e => { S.showLots = e.target.checked; redraw(); };
+$('#showDistricts').onchange = e => { S.showDistricts = e.target.checked; redraw(); };
+$('#showAlpr').onchange = e => { S.showAlpr = e.target.checked; redraw(); if (S.sel) renderDetail(); };
+$('#railToggle').onclick = () => { const r = $('#rail'); r.classList.toggle('collapsed'); $('#railToggle').setAttribute('aria-expanded', !r.classList.contains('collapsed')); };
+
+// search
+const q = $('#q'), sugg = $('#sugg'); let sIdx = -1, sList = [];
+function go(text) {
+  const g = geocode(text);
+  sugg.hidden = true;
+  if (!g) { q.setCustomValidity('Not found'); q.reportValidity(); setTimeout(() => q.setCustomValidity(''), 1500); return; }
+  q.value = g.label; fly(g.pt, g.num != null ? 17.2 : 15.5); query(g.pt[0], g.pt[1], g.label, g.num != null ? { base: g.street.base, num: g.num } : null);
+}
+q.oninput = () => {
+  sList = suggestions(q.value); sIdx = -1;
+  sugg.innerHTML = sList.map((s, i) => `<button data-i="${i}">${esc(s.text)}<small>${s.range}</small></button>`).join('');
+  sugg.hidden = !sList.length;
+};
+q.onkeydown = e => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { if (!sList.length) return; e.preventDefault(); sIdx = (sIdx + (e.key === 'ArrowDown' ? 1 : -1) + sList.length) % sList.length; sugg.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === sIdx)); }
+  if (e.key === 'Enter') { e.preventDefault(); go(sIdx >= 0 ? sList[sIdx].text : q.value); }
+  if (e.key === 'Escape') sugg.hidden = true;
+};
+sugg.onmousedown = e => { const b = e.target.closest('button'); if (b) { e.preventDefault(); go(sList[+b.dataset.i].text); } };
+q.onblur = () => setTimeout(() => sugg.hidden = true, 100);
+const SAVED = ['3800 Ingraham St', '8800 Sunset Blvd', '1600 Vine St', '1500 Echo Park Ave'];
+$('#saved').innerHTML = SAVED.map(s => `<button class="chip">${s}</button>`).join('');
+$('#saved').onclick = e => { if (e.target.tagName === 'BUTTON') go(e.target.textContent); };
+
+// ---------- map setup
+readTokens();
+const el = $('#map');
+function fitView() {
+  const w = el.clientWidth, wide = w > 900, free = wide ? w - 352 - 416 + 120 : w, z = Math.log2(free / 512 * 360 / 0.166);
+  const shift = wide ? (352 - 416) / 2 : 0, zz = Math.min(Math.max(z, 11), 14);
+  return { longitude: -118.3125 - shift * 360 / (512 * Math.pow(2, zz)), latitude: 34.0805, zoom: zz, pitch: 0, bearing: 0, minZoom: 11, maxZoom: 19 };
+}
+let vs = fitView(); viewZoom = vs.zoom;
+function fly(pt, zoom) {
+  vs = { ...vs, longitude: pt[0] + (innerWidth > 900 ? 0.0009 * Math.pow(2, 17 - zoom) : 0), latitude: pt[1] - (innerWidth <= 760 ? 0.0006 * Math.pow(2, 17 - zoom) : 0), zoom, transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900, transitionInterpolator: new deck.FlyToInterpolator() };
+  deckgl.setProps({ initialViewState: vs });
+}
+let zb = Math.round(viewZoom * 5);
+deckgl = new deck.Deck({
+  parent: el, views: new deck.MapView({ repeat: false }), initialViewState: vs, controller: { doubleClickZoom: true, touchRotate: false, dragRotate: false },
+  layers: [], getTooltip: tooltip, getCursor: ({ isHovering, isDragging }) => isDragging ? 'grabbing' : isHovering ? 'pointer' : 'crosshair',
+  onViewStateChange: ({ viewState }) => { vs = viewState; viewZoom = viewState.zoom; const nb = Math.round(viewZoom * 5); if (nb !== zb) { zb = nb; redraw(); } },
+  onClick: info => { if (!info.coordinate) return; const [lon, lat] = info.coordinate; if (info.layer && info.layer.id === 'lots' && info.object) { query(...info.object.pos, info.object.n || null); return; } query(lon, lat); },
+  style: { background: 'var(--ground)' }
+});
+$('#zin').onclick = () => { vs = { ...vs, zoom: Math.min(19, vs.zoom + 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
+$('#zout').onclick = () => { vs = { ...vs, zoom: Math.max(11, vs.zoom - 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
+$('#zfit').onclick = () => { vs = { ...fitView(), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ initialViewState: vs }); };
+
+const onTheme = () => { readTokens(); update(); };
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', onTheme);
+new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+$('#sources').innerHTML = `Sources: Dodgers home schedule (MLB Stats API), LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISO(C.permitRange[0])} 2025), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
+
+
+preset('tonight');
+const init = geocode('3800 Ingraham St');
+if (init) query(init.pt[0], init.pt[1], init.label, { base: init.street.base, num: init.num });
+document.fonts.load('600 12px "Figtree"').then(() => document.fonts.load('600 15px "Fraunces"')).catch(() => {}).finally(() => { fontReady = true; redraw(); });
+
+// live occupancy (works where the page is allowed to reach data.lacity.org; otherwise the build snapshot stays)
+const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);
+fetch('https://data.lacity.org/resource/e7h6-4a3e.json?$limit=60000', { signal: ctl.signal }).then(r => r.ok ? r.json() : Promise.reject()).then(rows => {
+  const m = new Map(rows.map(r => [r.spaceid, r])); let latest = '';
+  rows.forEach(r => { if (r.eventtime > latest) latest = r.eventtime; });
+  const lt = Date.parse(latest + 'Z');
+  for (const mt of meters) { const r = m.get(mt.id); if (!r) continue; mt.st = { OCCUPIED: 1, VACANT: 2 }[r.occupancystate] || 3; mt.age = Math.round((lt - Date.parse(r.eventtime + 'Z')) / MIN); }
+  occTime = latest; occLive = true; occFetched = Date.now(); redraw(); if (S.sel) renderDetail();
+}).catch(() => {});
+})();
+</script>
+</body>
+</html>

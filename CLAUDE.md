@@ -1,0 +1,56 @@
+# CurbWatch LA
+
+Street-parking map for Echo Park → West Hollywood (plus Koreatown/Hollywood in the
+bbox `-118.395,34.045,-118.230,34.115`). `README.md` is the public face; this file is
+the working document.
+
+Not deployed yet. Planned as a website (GitHub Pages like Greg's other sites), maybe an
+app later — `site.webmanifest` already makes it installable. Greg is designing the
+visual identity; the icons, `favicon.svg` and `og-image.png` are placeholders
+(`tools/make_images.py` regenerates them from the data).
+
+## Layout
+
+- `index.html` — the whole app: one file, inline CSS + JS, deck.gl 9.1.14 from jsDelivr,
+  Fraunces + Figtree from Google Fonts. The basemap is drawn from embedded data (no tiles).
+- `curb-data.js` — `window.CURB = {...}`, ~5 MB, generated. Don't hand-edit.
+- `tools/fetch.py` → `data/raw/*.json` (gitignored), `tools/build.py` → `curb-data.js`.
+- `tools/make_artifact.py` → `data/artifact.html`, a body-only copy for publishing as a
+  Claude artifact preview (the artifact host adds its own `<head>` and blocks
+  third-party fetches, so live meter occupancy only works on the real site).
+
+Coordinates in `curb-data.js` are ints in 1e-5° offsets from `(-118.40, 34.04)`, lines
+delta-encoded. Block rows are positional arrays — see the `bout.append` in `build.py`
+and the `blocks` decode in `index.html` before changing either.
+
+## Before launch
+
+- Replace `https://curbwatch.example/` with the real domain in `index.html` (canonical,
+  `og:url`, `og:image`, `twitter:image`, JSON-LD), `robots.txt` and `sitemap.xml`.
+  Add `CNAME` for Pages. See `quietbroadcast/CLAUDE.md` for the HTTPS/DNS ordering gotcha.
+- Swap in final icons and `og-image.png` (1200×630).
+- Page title/description live in `index.html` `<head>`; keep `og:`/`twitter:` copies in sync.
+
+## Data decisions (hard-won — read before changing)
+
+- **No LA permit-district polygons.** LADOT's only published PPD map is from Aug 2015 and
+  is wrong on the ground (W Lanewood Ave sits inside a 2015 district, has no permit
+  signs). Every public source was checked; nothing newer exists.
+- **LA permit streets come from tickets**, matched by the *address the officer wrote*,
+  not GPS: a block counts if ≥3 `PREFERENTIAL PARKING` / `OVNIGHT PRK W/OUT PE` tickets
+  on ≥2 days in 18 months have a location on that street within its number range.
+  GPS-only snapping pulled cross-street tickets onto the wrong block (that was the
+  Lanewood bug). All ticket stats use the same address matcher (`match_blocks`).
+- A permit verdict for the user's window needs ≥3 tickets in those hours **and** ≥5% of
+  the block's permit tickets (Sycamore 1700 had 36 of 1,164 at 8–10 PM — noise).
+- **District D** (Dodger Stadium special-event permit zone: no parking 4 hrs before and
+  during events, District D permits exempt) is in no dataset. `ZONE_D` in `build.py` is
+  Greg's street list: Douglas north of Sunset, Quintero, Sutherland, Macbeth,
+  Elysian Park Dr, Montana, Scott east of Portia. Extra blocks are inferred where ≥85%
+  of address-matched no-parking tickets fall on home-game days, and are labelled as
+  inferred. Concerts and other stadium events trigger it too but aren't in any feed.
+- WeHo data is the city's own and has posted hours — trust it over inference.
+- LA sweeping routes are polygons with paired routes (e.g. `5P223 Th` / `5P223 F`):
+  one side each day, and the data doesn't say which side.
+- LA's occupancy feed timestamps are UTC; display converts to LA time.
+- Parkopedia was tried and rejected (403, client-rendered, proprietary).
