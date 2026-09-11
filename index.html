@@ -114,6 +114,10 @@ button,input,select{font:inherit;color:inherit}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
 .winsum{font:600 22px/1.1 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 40}
 .gamenote{font-size:12.5px;color:var(--ink-2);line-height:1.4}
+.dataage{font-size:12px;color:var(--ink-3);line-height:1.4;display:flex;align-items:baseline;gap:6px}
+.dataage b{font-weight:600;color:var(--ink-2)}
+.dataage.stale{color:var(--amber)}
+.dataage.stale b{color:var(--amber)}
 .gamenote.on{color:var(--ink);background:color-mix(in srgb,var(--red) 12%,transparent);border-left:3px solid var(--red);padding:7px 10px;border-radius:10px}
 .win{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .win label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--ink-2)}
@@ -151,6 +155,7 @@ details.src p{margin:6px 0 0}
 .verdict{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:14px;border-left:4px solid}
 .verdict b{font:600 17px/1.15 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 30}
 .verdict span{font-size:13px;color:var(--ink-2)}
+.verdict .basis{display:block;margin-top:6px;font-size:11.5px;color:var(--ink-3);line-height:1.45}
 .signs{display:flex;flex-direction:column;gap:12px}
 .sign{background:var(--sign-bg);color:var(--sign-red);border-radius:10px;padding:5px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 3px 10px rgba(0,0,0,.08)}
 .sign .in{border:1.5px solid currentColor;border-radius:7px;padding:9px 10px 8px;text-align:center;font-family:var(--f-ui);text-transform:uppercase;line-height:1.05;letter-spacing:.02em}
@@ -222,6 +227,7 @@ details.src p{margin:6px 0 0}
     <div class="lbl">When you’re parking</div>
     <div class="winsum" id="winsum"></div>
     <div class="gamenote" id="gamenote"></div>
+    <div class="dataage" id="dataage"></div>
     <div class="win">
       <label>Arriving<input type="datetime-local" id="t0" step="900"></label>
       <label>Leaving<input type="datetime-local" id="t1" step="900"></label>
@@ -586,7 +592,7 @@ function lvlText(b) {
   if (S.mode === 'sweep') return b.next ? `Next sweep ${fmtD(b.next[0])} ${fmtT(b.next[0])}` : 'No posted sweeping';
   if (S.mode === 'permit') return b.ev.zone ? 'District D (Dodger events)' : !isPermit(b) ? '' : `${b.perm.n + b.perm.opd} permit tickets written here in 18 mo`;
   if (b.evHit) return 'Dodger game restriction in your window';
-  return ['', 'No published rule in your window', 'Metered', 'Check signs', 'Permit enforced at these hours', 'Street cleaning in your window'][b.lvl];
+  return ['', 'Nothing in the data for your window', 'Metered', 'Check signs', 'Permit enforced at these hours', 'Street cleaning in your window'][b.lvl];
 }
 
 // ---------- naming
@@ -760,13 +766,18 @@ function renderDetail() {
   if (!signs.length) signs.push(`<div><div class="sign k"><div class="in"><div class="mid">No posted rules in city data</div><div class="sm">No sweeping route, permit district or meter mapped here</div></div></div></div>`);
   if (b) { const busy = b.win[0] + b.win[1] + b.win[2] + b.win[3]; if (busy >= 3 && busy / b.len * 100 >= 2) caution.push(`${busy} tickets written on this block at these hours in 6 months`); }
   const winTxt = winLabel();
+  const winTot = b ? b.win.reduce((x, y) => x + y, 0) : 0;
+  const since = fmtISO(C.citeRange[0]);
+  const record = !b ? 'No ticket history for this spot.'
+    : winTot ? `${winTot} ticket${winTot === 1 ? '' : 's'} of any kind ${winTot === 1 ? 'was' : 'were'} written on this block at these hours since ${since}.`
+    : `No tickets of any kind were written on this block at these hours between ${since} and ${fmtISO(C.citeRange[1])}.`;
   let v;
-  if (hitEvent) v = [T.red, 'Dodger game during your window', 'Only District D permit holders can park here from 4 hours before first pitch until the game ends.'];
-  else if (hitSweep) v = [T.red, 'Street cleaning in your window', 'Move the car before the posted time, or park elsewhere.'];
-  else if (hitPermit) v = [T.blue, 'Permit only in your window', s.inWeho ? 'Without a district permit you’ll be cited.' : 'Permit tickets are written here at these hours.'];
+  if (hitEvent) v = [T.red, 'Dodger game during your window', 'District D permits only, from 4 hours before first pitch until the game ends.'];
+  else if (hitSweep) v = [T.red, 'Street cleaning in your window', 'The posted route runs during your window. Move before it starts.'];
+  else if (hitPermit) v = [T.blue, 'Permit hours, by the ticket record', s.inWeho ? 'West Hollywood’s posted hours make this block permit-only during your window.' : `${b.pwh} permit tickets were written here at these hours in the last 18 months.`];
   else if (caution.length) v = [T.amber, 'Check the signs', caution.join(' · ')];
-  else if (s.mets.length) v = [T.green, 'Metered parking', 'Nothing else published conflicts with your window.'];
-  else v = [T.unpainted, 'No published conflict', 'Nothing in city data restricts this spot in your window. Posted signs still win.'];
+  else if (s.mets.length) v = [T.green, 'Metered, nothing else in the data', `No sweeping, permit or event restriction covers this block in your window. ${record}`];
+  else v = [T.unpainted, 'Nothing restricts this in the data', `No sweeping route, permit street or event zone covers this block in your window. ${record}`];
   const cityTxt = s.inWeho ? 'West Hollywood' : 'City of Los Angeles';
   const tot = b ? b.all.reduce((x, y) => x + y, 0) : 0;
   const fineOf = v => C.fines[v];
@@ -774,7 +785,7 @@ function renderDetail() {
   el.innerHTML = `
     <div class="sec">
       <div class="dhead"><div><h2>${esc(s.label)}</h2><p>${esc(b ? blockTitle(b) + ' · ' : '')}${cityTxt}</p></div><button class="x" id="close" aria-label="Close">×</button></div>
-      <div class="verdict" style="border-color:rgb(${v[0].join(',')});background:rgba(${v[0].join(',')},.10)"><b>${esc(v[1])}</b><span>${esc(winTxt)} · ${esc(v[2])}</span></div>
+      <div class="verdict" style="border-color:rgb(${v[0].join(',')});background:rgba(${v[0].join(',')},.10)"><b>${esc(v[1])}</b><span>${esc(winTxt)} · ${esc(v[2])}</span><span class="basis">What the city published and what was ticketed before — not a promise about today. Red curbs, hydrants and temporary signs are in no dataset, and the posted sign is the authority.</span></div>
     </div>
     <div class="sec"><div class="lbl">What the signs say</div><div class="signs">${signs.join('')}</div></div>
     ${b ? `<div class="sec"><h3 class="h3">${tot} ticket${tot === 1 ? '' : 's'} on this block since ${fmtISO(C.citeRange[0])}</h3>
@@ -793,6 +804,7 @@ function fmtStamp(iso) {
   const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(iso.slice(0, 19) + 'Z')).map(x => [x.type, x.value]));
   const t = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute); return fmtD(t) + ', ' + fmtT(t);
 }
+function dataAgeDays() { return Math.max(0, Math.round((laNow() - Date.parse(C.meta.built.slice(0, 10) + 'T12:00Z')) / DAY)); }
 function winLabel() {
   const a = S.t0, b = S.t1, same = dayStart(a) === dayStart(b) || (b - dayStart(a) <= DAY && fmtT(b) === 'Midnight');
   const today = dayStart(laNow()), dn = d => d === today ? 'Today' : d === today + DAY ? 'Tomorrow' : fmtD(d);
@@ -805,7 +817,7 @@ function renderLegend() {
   let items = [], sub = '';
   if (S.mode === 'window') {
     items = [[T.red, S.game ? 'Street cleaning or Dodger game restriction' : 'Street cleaning during your window', cnt(b => b.lvl === 5)], [T.blue, 'Permit tickets written at these hours', cnt(b => b.lvl === 4)],
-      [T.amber, 'Permit street (other hours) or heavy ticketing', cnt(b => b.lvl === 3)], [T.green, 'Metered', cnt(b => b.lvl === 2)], [A(T.unpainted, 1), 'No published rule', cnt(b => b.lvl === 1)]];
+      [T.amber, 'Permit street (other hours) or heavy ticketing', cnt(b => b.lvl === 3)], [T.green, 'Metered', cnt(b => b.lvl === 2)], [A(T.unpainted, 1), 'Nothing in the data', cnt(b => b.lvl === 1)]];
   } else if (S.mode === 'tickets') {
     const r = T.red, lo = T.dark ? [90, 60, 62] : [236, 180, 170], mix = t => [0, 1, 2].map(j => Math.round(lo[j] + (r[j] - lo[j]) * t));
     const f = v => v < 10 ? v.toFixed(1) : Math.round(v);
@@ -830,6 +842,8 @@ function update() {
   $('#gamenote').innerHTML = S.game ? `<b>Dodgers home vs ${esc(S.game.opp)}</b> · ${fmtD(S.game.t)}, ${fmtT(S.game.t)}. District D streets are permit-only from ${fmtT(S.game.t - PRE)}.`
     : ng ? `No Dodgers home game in this window. Next: ${fmtD(ng.t)}, ${fmtT(ng.t)} vs ${esc(ng.opp)}.` : '';
   $('#gamenote').classList.toggle('on', !!S.game);
+  $('#dataage').innerHTML = `<b>Snapshot</b> tickets through ${fmtISO(C.citeRange[1])}, built ${esc(C.meta.built.slice(0, 10).split('-').slice(1).map(Number).join('/'))}${dataAgeDays() > 45 ? ` · ${dataAgeDays()} days old, enforcement may have changed` : ''}`;
+  $('#dataage').classList.toggle('stale', dataAgeDays() > 45);
   if (S.sel) renderDetail();
   redraw();
 }
