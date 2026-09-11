@@ -6,7 +6,7 @@ the working document.
 
 Not deployed yet. Planned as a website (GitHub Pages like Greg's other sites), maybe an
 app later — `site.webmanifest` already makes it installable. Greg is designing the
-visual identity. `FAVICON.png` (512×512) is his and is the only icon — favicon,
+visual identity. `FAVICON2.png` (512×512) is his and is the only icon — favicon,
 apple-touch-icon and manifest all point at it. `og-image.png` is still a placeholder
 (`tools/make_images.py` regenerates it from the data).
 

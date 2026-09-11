@@ -10,6 +10,6 @@
   "theme_color": "#4E7A52",
   "categories": ["travel", "navigation", "utilities"],
   "icons": [
-    { "src": "FAVICON.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    { "src": "FAVICON2.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
   ]
 }
