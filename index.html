@@ -215,8 +215,8 @@ details.src p{margin:6px 0 0}
 .deck-tooltip{font:13px/1.35 var(--f-ui)!important}
 .railtoggle{display:none}
 .dbtns{display:flex;gap:6px;flex:none}
-.sheet{display:none}
-.sheet svg{width:16px;height:16px;transition:transform .2s}
+.sheet{display:none;place-items:center;padding:0}
+.sheet svg{width:16px;height:16px;transition:transform .2s;display:block}
 @media (max-width:760px){
   #rail{left:calc(8px + var(--safe-l));right:calc(8px + var(--safe-r));top:calc(8px + var(--safe-t));width:auto;max-height:calc(52dvh - var(--safe-t))}
   #rail.collapsed .more{display:none}
