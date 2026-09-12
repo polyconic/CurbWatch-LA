@@ -59,6 +59,11 @@ and the `blocks` decode in `index.html` before changing either.
   Elysian Park Dr, Montana, Scott east of Portia. Extra blocks are inferred where ≥85%
   of address-matched no-parking tickets fall on home-game days, and are labelled as
   inferred. Concerts and other stadium events trigger it too but aren't in any feed.
+- The Dodger note only appears for selections within 2.4 km of the stadium (`nearStadium`) —
+  it's an Echo Park / Elysian Park problem and shouldn't nag Koreatown or WeHo. It also warns
+  that Sunset Bl restrictions change on game days (temporary tow-away along the stadium
+  approach), which is posted signage, not in any dataset. `renderGameNote()` must be called
+  wherever the selection changes, not just from `update()`.
 - WeHo data is the city's own and has posted hours — trust it over inference.
 - LA sweeping routes are polygons with paired routes (e.g. `5P223 Th` / `5P223 F`):
   one side each day, and the data doesn't say which side.

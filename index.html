@@ -277,7 +277,7 @@ details.src p{margin:6px 0 0}
   </div>
   <div class="sec more">
     <p class="fine" style="margin:0">Drawn from city data, not the curb itself: red curbs, hydrants, driveways and temporary signs aren’t mapped, and the posted sign always wins. LA hasn’t published its permit-district map since 2015, so LA permit streets appear only where permit tickets were written at that block’s own address; holidays suspend LA sweeping.</p>
-    <p class="fine" style="margin:0"><a href="terms.html">Terms &amp; data notes</a> — where this comes from, how current it is, and what it can’t see. Wrong block? <a href="https://github.com/polyconic/CurbWatch-LA/issues">Tell us</a>.</p>
+    <p class="fine" style="margin:0"><a href="terms.html">Terms &amp; data notes</a> — where this comes from, how current it is, and what it can’t see. Wrong block? <a href="mailto:hello@curbwatch.com?subject=CurbWatch%20LA%20correction">Tell us</a>.</p>
     <details class="src"><summary>Sources</summary><p class="fine" id="sources"></p></details>
     <span id="meterNote" hidden></span>
   </div>
@@ -433,6 +433,9 @@ function occurrences(r, from, to, cb) {
 function overlaps(r, a, b) { let hit = null; occurrences(r, a, b, (s, e) => { hit = [s, e]; return false; }); return hit; }
 function nextOcc(r, from, days = 70) { let hit = null; occurrences(r, from, from + days * DAY, (s, e) => { hit = [s, e]; return false; }); return hit; }
 const PRE = 4 * 36e5, POST = 3.5 * 36e5;
+const STADIUM = [-118.2400, 34.0739];
+// the game-day zone is an Echo Park / Elysian Park problem — don't nag the rest of the map about it
+const nearStadium = pt => pt && Math.hypot(...[0, 1].map(i => toM(...pt)[i] - toM(...STADIUM)[i])) < 2400;
 const games = C.games.map(([t, opp, type]) => ({ t: fromInput(t), opp, type }));
 const gameIn = (a, b) => games.find(g => g.t - PRE < b && g.t + POST > a) || null;
 const nextGame = a => games.find(g => g.t + POST > a) || null;
@@ -785,6 +788,7 @@ function renderDetail() {
   }
   if (!signs.length) signs.push(`<div><div class="sign k"><div class="in"><div class="mid">No posted rules in city data</div><div class="sm">No sweeping route, permit district or meter mapped here</div></div></div></div>`);
   if (b) { const busy = b.win[0] + b.win[1] + b.win[2] + b.win[3]; if (busy >= 3 && busy / b.len * 100 >= 2) caution.push(`${busy} tickets written on this block at these hours in 6 months`); }
+  if (nearStadium(s.pt) && /SUNSET/.test(b ? b.name : '')) caution.push('Sunset Bl restrictions change on Dodger game days — read the temporary signs');
   const winTxt = winLabel();
   const winTot = b ? b.win.reduce((x, y) => x + y, 0) : 0;
   const since = fmtISO(C.citeRange[0]);
@@ -815,7 +819,8 @@ function renderDetail() {
     ${S.showAlpr ? `<div class="sec"><div class="lbl">Plate readers within 400 m</div>${s.cams.length ? `<div class="list">${s.cams.map(([c, d]) => `<button class="li" data-cam="${alpr.indexOf(c)}"><span class="cm ${c.flock ? '' : 'o'}"></span><span>${c.flock ? 'Flock Safety' : esc(c.mfr || 'Unknown maker')}<small>${c.dirs.length ? 'Faces ' + c.dirs.map(compass).join(' & ') : 'Direction not mapped'}${c.op ? ' · ' + esc(c.op) : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('')}</div>` : '<div class="note">None mapped nearby.</div>'}
       <div class="fine">Community-mapped in OpenStreetMap, the same data DeFlock shows, so coverage is incomplete.</div></div>` : ''}`;
   el.hidden = false;
-  $('#close').onclick = () => { S.sel = null; el.hidden = true; redraw(); };
+  renderGameNote();
+  $('#close').onclick = () => { S.sel = null; el.hidden = true; renderGameNote(); redraw(); };
   el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
   el.querySelectorAll('[data-lot]').forEach(n => n.onclick = () => { const l = lots[+n.dataset.lot]; fly(l.pos, 17); });
 }
@@ -855,13 +860,20 @@ function renderLegend() {
   $('#subopts').querySelectorAll('[data-tc]').forEach(n => n.onclick = () => { S.tcat = +n.dataset.tc; update(); });
   const ta = $('#tAll'); if (ta) ta.onchange = () => { S.tAll = ta.checked; update(); };
 }
+// the game-day zone is an Echo Park problem; the note only appears for spots near the stadium
+function renderGameNote() {
+  const el = $('#gamenote'), show = S.sel && nearStadium(S.sel.pt), ng = S.game || nextGame(S.t0);
+  const sunset = ' Restrictions on Sunset Bl change on game days — temporary tow-away signs go up along the stadium approach.';
+  el.innerHTML = !show ? '' : S.game
+    ? `<b>Dodgers home vs ${esc(S.game.opp)}</b> · ${fmtD(S.game.t)}, ${fmtT(S.game.t)}. District D streets are permit-only from ${fmtT(S.game.t - PRE)}.${sunset}`
+    : ng ? `No Dodgers home game in this window. Next: ${fmtD(ng.t)}, ${fmtT(ng.t)} vs ${esc(ng.opp)}.${sunset}` : '';
+  el.hidden = !el.innerHTML;
+  el.classList.toggle('on', !!(show && S.game));
+}
 function update() {
   computeWindow(); classify(); renderLegend();
   $('#winsum').textContent = winLabel();
-  const ng = S.game || nextGame(S.t0);
-  $('#gamenote').innerHTML = S.game ? `<b>Dodgers home vs ${esc(S.game.opp)}</b> · ${fmtD(S.game.t)}, ${fmtT(S.game.t)}. District D streets are permit-only from ${fmtT(S.game.t - PRE)}.`
-    : ng ? `No Dodgers home game in this window. Next: ${fmtD(ng.t)}, ${fmtT(ng.t)} vs ${esc(ng.opp)}.` : '';
-  $('#gamenote').classList.toggle('on', !!S.game);
+  renderGameNote();
   $('#dataage').innerHTML = `<b>Snapshot</b> tickets through ${fmtISO(C.citeRange[1])}, built ${esc(C.meta.built.slice(0, 10).split('-').slice(1).map(Number).join('/'))}${dataAgeDays() > 45 ? ` · ${dataAgeDays()} days old, enforcement may have changed` : ''}`;
   $('#dataage').classList.toggle('stale', dataAgeDays() > 45);
   if (S.sel) renderDetail();
@@ -952,7 +964,7 @@ $('#theme').onclick = () => {
 };
 syncTheme();
 $('#reset').onclick = () => {
-  S.sel = null; $('#detail').hidden = true;
+  S.sel = null; $('#detail').hidden = true; renderGameNote();
   q.value = ''; sugg.hidden = true; sList = []; sIdx = -1;
   S.mode = 'window'; S.tcat = -1; S.tAll = false;
   $('#mode').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === 'window'));
