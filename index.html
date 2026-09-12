@@ -799,6 +799,8 @@ function lotLine(l) {
   return [l.k === 'garage' ? 'Garage' : 'Lot', l.acc === 'customers' ? 'customers only' : l.acc === 'yes' ? 'public' : '', l.fee === 'yes' ? 'paid' : l.fee === 'no' ? 'free' : '', l.s ? l.s + ' spaces' : '', l.h].filter(Boolean).join(' · ');
 }
 const isMobile = () => innerWidth <= 760;
+// close enough to read the block, wide enough to place it: ~1 km across at addr, a neighbourhood at street
+const Z = { addr: () => isMobile() ? 15.6 : 16.2, street: () => isMobile() ? 14.2 : 14.8, spot: () => isMobile() ? 16.4 : 16.8 };
 // the report link pre-fills the block and what the map said, so a reply only needs what the sign says
 const reportLink = (where, said) => `<span class="report">Incorrect? <a href="mailto:hello@curbwatch.la?subject=${encodeURIComponent('CurbWatch LA correction: ' + where)}&body=${encodeURIComponent('Block: ' + where + '\nThe map says: ' + said + '\nThe sign says: ')}">Report it</a></span>`;
 const DBTNS = `<div class="dbtns"><button class="x sheet" id="sheet" type="button" aria-label="Show more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="x" id="close" aria-label="Close">×</button></div>`;
@@ -825,7 +827,7 @@ function renderDetail() {
       <div class="fine">Cameras are mapped by volunteers in OpenStreetMap and aren’t city data, so they show up everywhere — including here.</div></div>` : ''}`;
     el.hidden = false;
     renderGameNote(); applySheet();
-    el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
+    el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, Z.spot()));
     return;
   }
   const b = s.block, a = S.t0, e = Math.max(S.t1, S.t0 + 15 * MIN);
@@ -904,8 +906,8 @@ function renderDetail() {
       <div class="fine">Community-mapped in OpenStreetMap, the same data DeFlock shows, so coverage is incomplete.</div></div>` : ''}`;
   el.hidden = false;
   renderGameNote(); applySheet();
-  el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
-  el.querySelectorAll('[data-lot]').forEach(n => n.onclick = () => { const l = lots[+n.dataset.lot]; fly(l.pos, 17); });
+  el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, Z.spot()));
+  el.querySelectorAll('[data-lot]').forEach(n => n.onclick = () => { const l = lots[+n.dataset.lot]; fly(l.pos, Z.spot()); });
 }
 const fmtISO = s => { const [y, m, d] = s.split('-').map(Number); return MON[m - 1] + ' ' + d; };
 const fmtISOy = s => fmtISO(s) + ' ' + s.slice(0, 4);
@@ -992,7 +994,7 @@ function go(text) {
   sugg.hidden = true;
   if (!g) { q.setCustomValidity('Not found'); q.reportValidity(); setTimeout(() => q.setCustomValidity(''), 1500); return; }
   q.value = g.label; if (isMobile()) q.blur(); S.touched = true;
-  fly(g.pt, g.num != null ? (isMobile() ? 16.5 : 17.2) : (isMobile() ? 14.8 : 15.5)); query(g.pt[0], g.pt[1], g.label, g.num != null ? { base: g.street.base, num: g.num } : null);
+  fly(g.pt, g.num != null ? Z.addr() : Z.street()); query(g.pt[0], g.pt[1], g.label, g.num != null ? { base: g.street.base, num: g.num } : null);
   setURL('?q=' + encodeURIComponent(g.label));
 }
 // searches are linkable (?q=1157 Lemoyne St); the 404 page's search box lands here too
