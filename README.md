@@ -2,6 +2,23 @@
 
 Street parking, block by block, from Echo Park to West Hollywood. Search an address or click any block to see its street-sweeping days, whether it's a permit street and when that's enforced, Dodger game-day restrictions, meters, nearby lots, plate-reader cameras, and where tickets actually get written.
 
+## Coverage
+
+Elysian Park west to Doheny, Franklin down to roughly Pico. Labelled on the map:
+
+| | |
+|---|---|
+| **Eastside** | Elysian Park, Angelino Heights, Echo Park, Westlake, Silver Lake, Virgil Village |
+| **Central** | Los Feliz, East Hollywood, Koreatown, Hollywood, Larchmont, Hancock Park |
+| **West** | Mid-Wilshire, Fairfax, Beverly Grove, West Hollywood |
+
+Also inside the covered area, unlabelled: Thai Town, Little Armenia, Historic Filipinotown,
+Rampart Village, Melrose, Carthay, and the edge of Beverly Hills — which carries no parking
+data here, being its own city. West Hollywood is too, and has its own rules; it's drawn with
+a dashed boundary and uses the city's own permit and sweeping schedules.
+
+## Running it
+
 Static site: `index.html` plus a data snapshot in `curb-data.js`. No build step to view it.
 
 ```
