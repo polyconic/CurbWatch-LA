@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#EEEAE1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1C1B18" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
+<script>try{const t=localStorage.getItem('curbwatch-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
 <style>
 :root{--ground:#EEEAE1;--panel:#FBFAF6;--ink:#2A2926;--ink-2:#6B675F;--ink-3:#9A958B;--line:#E2DDD1;--moss:#4E7A52;--red:#C8433B}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#1C1B18;--panel:#26241F;--ink:#EDE9DF;--ink-2:#A9A497;--ink-3:#7D786C;--line:#3B3831;--moss:#7FB08A;--red:#E0625A}}
@@ -18,7 +19,10 @@
 body{margin:0;background:var(--ground);color:var(--ink);font:16px/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
 main{max-width:40rem;margin:0 auto;padding:56px 24px 96px}
 a{color:var(--moss)}
-h1{font:600 38px/1.1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.02em;margin:0 0 6px;letter-spacing:-.01em}
+.top{margin:0 0 32px;font-size:14px}
+.top a{text-decoration:none;font-weight:600}
+.top a:hover{text-decoration:underline}
+h1{font:600 38px/1.1 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.02em;margin:0 0 6px}
 .sub{color:var(--ink-2);margin:0 0 40px}
 h2{font:600 21px/1.25 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:-.02em;margin:38px 0 10px}
 p,li{color:var(--ink-2)}
@@ -33,6 +37,7 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
 </head>
 <body>
 <main>
+  <p class="top"><a href="/">← CurbWatch LA</a></p>
   <h1>Terms &amp; data notes</h1>
   <p class="sub">What CurbWatch LA knows, how it knows it, and where it stops.</p>
 
@@ -58,7 +63,7 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
     <li><strong>OpenStreetMap</strong> — streets, parks, off-street lots, and plate-reader camera
     locations. © OpenStreetMap contributors, <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</a>.
     Those parts of the data file are a derivative database and stay under that licence — see
-    <a href="DATA-LICENSE.md">DATA-LICENSE.md</a>.</li>
+    <a href="https://github.com/polyconic/CurbWatch-LA/blob/main/DATA-LICENSE.md">DATA-LICENSE.md</a>.</li>
     <li><strong>Dodger Stadium home dates</strong> — kept by hand from the published schedule.</li>
   </ul>
 

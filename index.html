@@ -89,6 +89,9 @@ button,input,select{font:inherit;color:inherit}
 #map{position:fixed;inset:0}
 .loading{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;padding:10px 18px;border-radius:999px;background:var(--glass);border:1px solid var(--line);color:var(--ink-2);font-size:14px;box-shadow:var(--shadow)}
 .loading[hidden]{display:none}
+.loading.err{max-width:min(380px,calc(100vw - 32px));border-radius:16px;padding:16px 20px;line-height:1.45;text-align:left;z-index:3}
+.loading.err b{display:block;color:var(--ink);font-size:16px;margin-bottom:4px}
+.loading.err a{color:var(--moss)}
 .panel{position:fixed;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);z-index:2}
 #rail{top:16px;left:16px;width:384px;max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;padding:6px 0}
 #detail{top:16px;right:16px;width:384px;max-height:calc(100dvh - 32px);overflow:auto;padding:6px 0}
@@ -293,8 +296,15 @@ details.src p{margin:6px 0 0}
 <script src="curb-data.js"></script>
 <script>
 (() => {
-const C = window.CURB, O = [C.meta.lon0, C.meta.lat0];
 const $ = s => document.querySelector(s);
+function fail(why) {
+  const l = $('#loading'); l.hidden = false; l.className = 'loading err';
+  l.innerHTML = `<b>The map didn’t load.</b>${why} If it keeps happening, <a href="mailto:hello@curbwatch.la?subject=CurbWatch%20LA%20won%E2%80%99t%20load">tell us</a> which browser you’re on. The <a href="terms.html">terms &amp; data notes</a> still work.`;
+}
+if (!window.CURB) return fail('The data file didn’t arrive — a reload usually fixes it.');
+if (!window.deck) return fail('The map library didn’t arrive — a reload usually fixes it.');
+try {
+const C = window.CURB, O = [C.meta.lon0, C.meta.lat0];
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const KX = Math.cos(34.08 * Math.PI / 180) * 111320, KY = 110574;
 
@@ -466,6 +476,7 @@ function computeWindow() {
     const w = [0, 0, 0, 0, 0], all = [0, 0, 0, 0, 0];
     for (let i = 0; i < bl.cit.length; i += 2) { const k = bl.cit[i], n = bl.cit[i + 1], c = Math.floor(k / 168); all[c] += n; if (slotMask[k % 168]) w[c] += n; }
     bl.win = w; bl.all = all;
+    bl.rec = (bl.routes.length || bl.nmet || bl.perm || bl.ev.zone) ? 2 : all.some(n => n > 0) ? 1 : 0;
     bl.pwh = bl.perm ? bl.perm.hrs.reduce((acc, n, h) => acc + (winHours[h] ? n : 0), 0) : 0;
     bl.sweepHit = bl.routes.some(r => routeHit[r]);
     bl.evHit = !!(bl.ev.zone && S.game);
@@ -508,7 +519,6 @@ function classify() {
   for (const b of blocks) {
     if (S.mode === 'window') {
       const busy = b.win[0] + b.win[1] + b.win[2] + b.win[3], pm = isPermit(b) && !b.ev.zone;
-      b.rec = (b.routes.length || b.nmet || b.perm || b.ev.zone) ? 2 : b.all.some(n => n > 0) ? 1 : 0;
       b.lvl = b.sweepHit || b.evHit ? 5 : (pm && permHit(b)) ? 4 : ((pm && b.perm) || (busy >= 3 && busy / b.len * 100 >= 2)) ? 3 : b.nmet ? 2 : 1;
     } else if (S.mode === 'tickets') {
       const v = ticketVal(b); b.lvl = v <= 0 ? 0 : v < tBreaks[0] ? 1 : v < tBreaks[1] ? 2 : v < tBreaks[2] ? 3 : 4;
@@ -627,6 +637,7 @@ function lvlText(b) {
   if (S.mode === 'sweep') return b.next ? `Next sweep ${fmtD(b.next[0])} ${fmtT(b.next[0])}` : 'No posted sweeping';
   if (S.mode === 'permit') return b.ev.zone ? 'District D (Dodger events)' : !isPermit(b) ? '' : `${b.perm.n + b.perm.opd} permit tickets written here in 18 mo`;
   if (b.evHit) return 'Dodger game restriction in your window';
+  if (b.lvl === 1 && b.rec === 0) return 'No records for this block';
   return ['', 'Nothing in the data for your window', 'Metered', 'Check signs', 'Permit enforced at these hours', 'Street cleaning in your window'][b.lvl];
 }
 
@@ -772,7 +783,7 @@ function renderDetail() {
       <div class="fine">Cameras are mapped by volunteers in OpenStreetMap and aren’t city data, so they show up everywhere — including here.</div></div>` : ''}`;
     el.hidden = false;
     renderGameNote();
-    $('#close').onclick = () => { S.sel = null; el.hidden = true; renderGameNote(); redraw(); };
+    $('#close').onclick = clearSel;
     el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
     return;
   }
@@ -802,7 +813,7 @@ function renderDetail() {
     const pr = b.perm, span = permSpan(pr.hrs), pw = b.pwh;
     const overnight = pr.opd >= 3 && pr.opd >= pr.n;
     signs.push(`<div><div class="sign g inf"><div class="in"><div class="big">${overnight ? 'Overnight permit parking' : 'Permit parking'}</div>${span ? `<div class="mid">Ticketed ${fmtMin(span[0] * 60)} to ${fmtMin(span[1] * 60)}</div>` : ''}<div class="sm">District permits exempt · exact hours on the posted sign</div><div class="tag"><span>From ticket records, not the sign</span></div></div></div>
-      <div class="smeta"><span>${pr.n + pr.opd} permit tickets written on this block since ${fmtISO(C.permitRange[0])} 2025, last ${fmtISO(pr.last)}</span>${permHit(b) ? `<span class="hit">${pw} written at your hours</span>` : pw ? `<span>Only ${pw} at your hours (${Math.round(pw / (pr.n + pr.opd) * 100)}%)</span>` : '<span class="ok">None at your hours</span>'}</div></div>`);
+      <div class="smeta"><span>${pr.n + pr.opd} permit tickets written on this block since ${fmtISOy(C.permitRange[0])}, last ${fmtISO(pr.last)}</span>${permHit(b) ? `<span class="hit">${pw} written at your hours</span>` : pw ? `<span>Only ${pw} at your hours (${Math.round(pw / (pr.n + pr.opd) * 100)}%)</span>` : '<span class="ok">None at your hours</span>'}</div></div>`);
     if (permHit(b)) hitPermit = true; else caution.push('Permit street, enforced at other hours');
   }
   if (s.mets.length) {
@@ -832,6 +843,7 @@ function renderDetail() {
   else if (s.mets.length) v = [T.green, 'Metered, nothing else in the data', `No sweeping, permit or event restriction covers this block in your window. ${record}`];
   else if (b && b.rec === 0) v = [T['ink-3'], 'No data for this block', `Nothing in the city's records reaches this block: no sweeping route, no meter, no permit tickets, and no citation of any kind since ${since}. That's missing information, not permission — whatever is posted here, we can't see it.`];
   else if (b && b.rec === 1) v = [T.amber, 'Ticketed here, but no rule mapped', `${tot} ticket${tot === 1 ? '' : 's'} written on this block since ${since}, yet no sweeping route, meter or permit street covers it. Something is posted that the city's own map doesn't show.`];
+  else if (!b && (s.ws.length || s.wp.length || s.wDist.length)) v = [T.unpainted, 'Nothing restricts this in your window', 'West Hollywood’s posted sweeping and permit hours are clear of your window. The city doesn’t publish citations, so there’s no ticket history to check against.'];
   else if (!b) v = [T['ink-3'], 'No data for this spot', 'This point isn’t on a mapped block, so there’s nothing to report. Try clicking the street itself.'];
   else v = [T.unpainted, 'Nothing restricts this in your window', `No sweeping route, permit street or event zone covers this block in your window. ${record}`];
   const cityTxt = s.inWeho ? 'West Hollywood' : 'City of Los Angeles';
@@ -851,11 +863,12 @@ function renderDetail() {
       <div class="fine">Community-mapped in OpenStreetMap, the same data DeFlock shows, so coverage is incomplete.</div></div>` : ''}`;
   el.hidden = false;
   renderGameNote();
-  $('#close').onclick = () => { S.sel = null; el.hidden = true; renderGameNote(); redraw(); };
+  $('#close').onclick = clearSel;
   el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
   el.querySelectorAll('[data-lot]').forEach(n => n.onclick = () => { const l = lots[+n.dataset.lot]; fly(l.pos, 17); });
 }
 const fmtISO = s => { const [y, m, d] = s.split('-').map(Number); return MON[m - 1] + ' ' + d; };
+const fmtISOy = s => fmtISO(s) + ' ' + s.slice(0, 4);
 function fmtStamp(iso) {
   const p = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(iso.slice(0, 19) + 'Z')).map(x => [x.type, x.value]));
   const t = Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute); return fmtD(t) + ', ' + fmtT(t);
@@ -875,7 +888,7 @@ function renderLegend() {
     items = [[T.red, S.game ? 'Street cleaning or Dodger game restriction' : 'Street cleaning during your window', cnt(b => b.lvl === 5)], [T.blue, 'Permit tickets written at these hours', cnt(b => b.lvl === 4)],
       [T.amber, 'Permit street (other hours) or heavy ticketing', cnt(b => b.lvl === 3)], [T.green, 'Metered', cnt(b => b.lvl === 2)],
       [A(T.unpainted, 1), 'No rule in your window', cnt(b => b.lvl === 1 && b.rec > 0)],
-      [A(T['ink-3'], T.dark ? 90 : 110), 'No records at all for the block', cnt(b => b.lvl === 1 && b.rec === 0)]];
+      [A(T['ink-3'], T.dark ? .35 : .45), 'No records at all for the block', cnt(b => b.lvl === 1 && b.rec === 0)]];
   } else if (S.mode === 'tickets') {
     const r = T.red, lo = T.dark ? [90, 60, 62] : [236, 180, 170], mix = t => [0, 1, 2].map(j => Math.round(lo[j] + (r[j] - lo[j]) * t));
     const f = v => v < 10 ? v.toFixed(1) : Math.round(v);
@@ -939,7 +952,11 @@ function go(text) {
   sugg.hidden = true;
   if (!g) { q.setCustomValidity('Not found'); q.reportValidity(); setTimeout(() => q.setCustomValidity(''), 1500); return; }
   q.value = g.label; fly(g.pt, g.num != null ? 17.2 : 15.5); query(g.pt[0], g.pt[1], g.label, g.num != null ? { base: g.street.base, num: g.num } : null);
+  setURL('?q=' + encodeURIComponent(g.label));
 }
+// searches are linkable (?q=1157 Lemoyne St); the 404 page's search box lands here too
+const setURL = s => { try { history.replaceState(null, '', s); } catch (e) {} };
+function clearSel() { S.sel = null; $('#detail').hidden = true; renderGameNote(); redraw(); setURL(location.pathname); }
 q.oninput = () => {
   sList = suggestions(q.value); sIdx = -1;
   sugg.innerHTML = sList.map((s, i) => `<button data-i="${i}">${esc(s.text)}<small>${s.range}</small></button>`).join('');
@@ -966,15 +983,18 @@ function fly(pt, zoom) {
   vs = { ...vs, longitude: pt[0] + (innerWidth > 900 ? 0.0009 * Math.pow(2, 17 - zoom) : 0), latitude: pt[1] - (innerWidth <= 760 ? 0.0006 * Math.pow(2, 17 - zoom) : 0), zoom, transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900, transitionInterpolator: new deck.FlyToInterpolator() };
   deckgl.setProps({ initialViewState: vs });
 }
-let zb = Math.round(viewZoom * 5);
+let zb = Math.round(viewZoom * 5), mapUp = false;
+const noWebGL = () => { if (!mapUp) fail('Your browser couldn’t start WebGL, which this map needs to draw the streets. Another browser, or turning hardware acceleration on, usually fixes it.'); };
 deckgl = new deck.Deck({
   parent: el, views: new deck.MapView({ repeat: false }), initialViewState: vs, controller: { doubleClickZoom: true, touchRotate: false, dragRotate: false },
   layers: [], getTooltip: tooltip, getCursor: ({ isHovering, isDragging }) => isDragging ? 'grabbing' : isHovering ? 'pointer' : 'crosshair',
   onViewStateChange: ({ viewState }) => { vs = viewState; viewZoom = viewState.zoom; const nb = Math.round(viewZoom * 5); if (nb !== zb) { zb = nb; redraw(); } },
   onClick: info => { if (!info.coordinate) return; const [lon, lat] = info.coordinate; if (info.layer && info.layer.id === 'lots' && info.object) { query(...info.object.pos, info.object.n || null); return; } query(lon, lat); },
+  onLoad: () => { mapUp = true; $('#loading').hidden = true; },
+  onError: e => { console.error(e); noWebGL(); },
   style: { background: 'var(--ground)' }
 });
-$('#loading').hidden = true;
+setTimeout(noWebGL, 12000);
 $('#zin').onclick = () => { vs = { ...vs, zoom: Math.min(19, vs.zoom + 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
 $('#zout').onclick = () => { vs = { ...vs, zoom: Math.max(11, vs.zoom - 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
 $('#zfit').onclick = () => { vs = { ...fitView(), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ initialViewState: vs }); };
@@ -996,7 +1016,7 @@ $('#theme').onclick = () => {
 };
 syncTheme();
 $('#reset').onclick = () => {
-  S.sel = null; $('#detail').hidden = true; renderGameNote();
+  clearSel();
   q.value = ''; sugg.hidden = true; sList = []; sIdx = -1;
   S.mode = 'window'; S.tcat = -1; S.tAll = false;
   $('#mode').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === 'window'));
@@ -1005,20 +1025,25 @@ $('#reset').onclick = () => {
   preset('default');
   vs = { ...fitView(), transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, transitionInterpolator: new deck.FlyToInterpolator() };
   deckgl.setProps({ initialViewState: vs });
-  q.focus();
+  if (innerWidth > 760) q.focus();
 };
 const onTheme = () => { syncTheme(); readTokens(); update(); };
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!store.get('curbwatch-theme')) { delete document.documentElement.dataset.theme; onTheme(); } });
 new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-$('#sources').innerHTML = `Sources: Dodger Stadium home dates, LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISO(C.permitRange[0])} 2025), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
+$('#sources').innerHTML = `Sources: Dodger Stadium home dates, LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISOy(C.permitRange[0])}), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
 
 
 preset('default');
-// open on one block as a worked example — Lemoyne has sweeping, meters and a permit street
-// that isn't on LA's 2015 map, so the panel shows what this thing actually does
-const init = geocode('1157 Lemoyne St');
-if (init) query(init.pt[0], init.pt[1], init.label, { base: init.street.base, num: init.num });
+// a linked search opens on that address; otherwise open on one block as a worked example —
+// Lemoyne has sweeping, meters and a permit street that isn't on LA's 2015 map
+const linked = new URLSearchParams(location.search).get('q');
+if (linked && geocode(linked)) go(linked);
+else {
+  const init = geocode('1157 Lemoyne St');
+  if (init) query(init.pt[0], init.pt[1], init.label, { base: init.street.base, num: init.num });
+  if (linked) setURL(location.pathname);
+}
 document.fonts.ready.catch(() => {}).finally(() => { fontReady = true; redraw(); });
 
 // live occupancy (works where the page is allowed to reach data.lacity.org; otherwise the build snapshot stays)
@@ -1030,6 +1055,7 @@ fetch('https://data.lacity.org/resource/e7h6-4a3e.json?$limit=60000', { signal: 
   for (const mt of meters) { const r = m.get(mt.id); if (!r) continue; mt.st = { OCCUPIED: 1, VACANT: 2 }[r.occupancystate] || 3; mt.age = Math.round((lt - Date.parse(r.eventtime + 'Z')) / MIN); }
   occTime = latest; occLive = true; occFetched = Date.now(); redraw(); if (S.sel) renderDetail();
 }).catch(() => {});
+} catch (e) { console.error(e); fail('Something went wrong while setting it up.'); }
 })();
 </script>
 </body>
