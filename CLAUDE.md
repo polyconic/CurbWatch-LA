@@ -32,6 +32,11 @@ and the `blocks` decode in `index.html` before changing either.
   Add `CNAME` for Pages. See `quietbroadcast/CLAUDE.md` for the HTTPS/DNS ordering gotcha.
 - Page title/description live in `index.html` `<head>`; keep `og:`/`twitter:` copies in sync.
 
+- `terms.html` is the disclaimer/privacy page, linked from the rail footnote and the sitemap.
+  Keep it honest about the snapshot, the inferences and the one live request.
+- Camera layer is labelled "Plate readers", not by any manufacturer — a quarter of them aren't
+  Flock, and a tip-jar site shouldn't wear one company's trademark as a feature name.
+
 ## Data decisions (hard-won — read before changing)
 
 - **No LA permit-district polygons.** LADOT's only published PPD map is from Aug 2015 and

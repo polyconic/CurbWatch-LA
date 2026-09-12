@@ -269,11 +269,12 @@ details.src p{margin:6px 0 0}
       <label class="tg"><input type="checkbox" id="showMeters" checked><span class="dot" style="background:var(--green)"></span>Meters</label>
       <label class="tg"><input type="checkbox" id="showLots" checked><span class="psq">P</span>Garages &amp; lots</label>
       <label class="tg"><input type="checkbox" id="showDistricts"><span class="dot" style="background:var(--blue)"></span>WeHo permit districts</label>
-      <label class="tg"><input type="checkbox" id="showAlpr" checked><span class="cam"></span>Flock cameras</label>
+      <label class="tg"><input type="checkbox" id="showAlpr" checked><span class="cam"></span>Plate readers</label>
     </div>
   </div>
   <div class="sec more">
     <p class="fine" style="margin:0">Drawn from city data, not the curb itself: red curbs, hydrants, driveways and temporary signs aren’t mapped, and the posted sign always wins. LA hasn’t published its permit-district map since 2015, so LA permit streets appear only where permit tickets were written at that block’s own address; holidays suspend LA sweeping.</p>
+    <p class="fine" style="margin:0"><a href="terms.html">Terms &amp; data notes</a> — where this comes from, how current it is, and what it can’t see.</p>
     <details class="src"><summary>Sources</summary><p class="fine" id="sources"></p></details>
     <span id="meterNote" hidden></span>
   </div>
@@ -592,7 +593,7 @@ function tooltip({ object, layer }) {
   if (!object || !layer) return null;
   const st = { background: getComputedStyle(document.documentElement).getPropertyValue('--panel'), color: getComputedStyle(document.documentElement).getPropertyValue('--ink'), border: '1px solid ' + getComputedStyle(document.documentElement).getPropertyValue('--line'), borderRadius: '6px', padding: '6px 9px', maxWidth: '260px' };
   if (layer.id === 'meters') return { html: `<b>${esc(object.lim.replace('HR', ' hr').replace('MIN', ' min'))} · ${esc(object.rate)}</b><br>${esc(object.face)}<br><span style="opacity:.7">Space ${esc(object.id)}${object.st ? ' · ' + (['', 'Occupied', 'Open', 'Unknown'][object.st]) + (object.age ? ` ${ago(object.age)}` : '') : ''}</span>`, style: st };
-  if (layer.id === 'alpr') return { html: `<b>${object.flock ? 'Flock plate reader' : 'Plate reader'}</b>${object.mfr && !object.flock ? ' · ' + esc(object.mfr) : ''}<br><span style="opacity:.7">${object.dirs.length ? 'Faces ' + object.dirs.map(compass).join(' & ') : 'Direction not mapped'}${object.op ? ' · ' + esc(object.op) : ''}</span>`, style: st };
+  if (layer.id === 'alpr') return { html: `<b>Plate reader</b>${object.mfr ? ' · ' + esc(object.mfr) : ''}<br><span style="opacity:.7">${object.dirs.length ? 'Faces ' + object.dirs.map(compass).join(' & ') : 'Direction not mapped'}${object.op ? ' · ' + esc(object.op) : ''}</span>`, style: st };
   if (layer.id === 'lots') return { html: `<b>${esc(object.n || (object.k === 'garage' ? 'Parking garage' : 'Parking lot'))}</b><br><span style="opacity:.7">${esc(lotLine(object))}</span>`, style: st };
   if (layer.id === 'overlay') {
     if (object.kind === 'la') return { html: `<b>${esc(blockTitle(object))}</b><br><span style="opacity:.75">${esc(lvlText(object))}</span>`, style: st };
@@ -950,7 +951,7 @@ const onTheme = () => { syncTheme(); readTokens(); update(); };
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!store.get('curbwatch-theme')) { delete document.documentElement.dataset.theme; onTheme(); } });
 new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-$('#sources').innerHTML = `Sources: Dodgers home schedule (MLB Stats API), LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISO(C.permitRange[0])} 2025), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
+$('#sources').innerHTML = `Sources: Dodger Stadium home dates, LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISO(C.permitRange[0])} 2025), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
 
 
 preset('tonight');
