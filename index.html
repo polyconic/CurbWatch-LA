@@ -985,23 +985,25 @@ function fitView(withDetail) {
 let vs = fitView(true); viewZoom = vs.zoom;
 function fly(pt, zoom) {
   vs = { ...vs, longitude: pt[0] + (innerWidth > 900 ? 0.0009 * Math.pow(2, 17 - zoom) : 0), latitude: pt[1] - (innerWidth <= 760 ? 0.0006 * Math.pow(2, 17 - zoom) : 0), zoom, transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900, transitionInterpolator: new deck.FlyToInterpolator() };
-  deckgl.setProps({ initialViewState: vs });
+  deckgl.setProps({ viewState: vs });
 }
 let zb = Math.round(viewZoom * 5), mapUp = false;
 const noWebGL = () => { if (!mapUp) fail('Your browser couldn’t start WebGL, which this map needs to draw the streets. Another browser, or turning hardware acceleration on, usually fixes it.'); };
 deckgl = new deck.Deck({
-  parent: el, views: new deck.MapView({ repeat: false }), initialViewState: vs, controller: { doubleClickZoom: true, touchRotate: false, dragRotate: false },
+  parent: el, views: new deck.MapView({ repeat: false }), viewState: vs, controller: { doubleClickZoom: true, touchRotate: false, dragRotate: false },
   layers: [], getTooltip: tooltip, getCursor: ({ isHovering, isDragging }) => isDragging ? 'grabbing' : isHovering ? 'pointer' : 'crosshair',
-  onViewStateChange: ({ viewState }) => { vs = viewState; viewZoom = viewState.zoom; const nb = Math.round(viewZoom * 5); if (nb !== zb) { zb = nb; redraw(); } },
+  // controlled view state: deck ignores an initialViewState equal to the last one, which made a
+  // second reset after a manual zoom do nothing
+  onViewStateChange: ({ viewState }) => { vs = viewState; deckgl.setProps({ viewState: vs }); viewZoom = viewState.zoom; const nb = Math.round(viewZoom * 5); if (nb !== zb) { zb = nb; redraw(); } },
   onClick: info => { if (!info.coordinate) return; const [lon, lat] = info.coordinate; if (info.layer && info.layer.id === 'lots' && info.object) { query(...info.object.pos, info.object.n || null); return; } query(lon, lat); },
   onLoad: () => { mapUp = true; $('#loading').hidden = true; },
   onError: e => { console.error(e); noWebGL(); },
   style: { background: 'var(--ground)' }
 });
 setTimeout(noWebGL, 12000);
-$('#zin').onclick = () => { vs = { ...vs, zoom: Math.min(19, vs.zoom + 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
-$('#zout').onclick = () => { vs = { ...vs, zoom: Math.max(11, vs.zoom - 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
-$('#zfit').onclick = () => { vs = { ...fitView(!!S.sel), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ initialViewState: vs }); };
+$('#zin').onclick = () => { vs = { ...vs, zoom: Math.min(19, vs.zoom + 1), transitionDuration: 250 }; deckgl.setProps({ viewState: vs }); };
+$('#zout').onclick = () => { vs = { ...vs, zoom: Math.max(11, vs.zoom - 1), transitionDuration: 250 }; deckgl.setProps({ viewState: vs }); };
+$('#zfit').onclick = () => { vs = { ...fitView(!!S.sel), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ viewState: vs }); };
 
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 const saved = store.get('curbwatch-theme');
@@ -1028,7 +1030,7 @@ $('#reset').onclick = () => {
   for (const [id, on] of [['showMeters', true], ['showLots', true], ['showAlpr', true], ['showDistricts', false]]) $('#' + id).checked = on;
   preset('default');
   vs = { ...fitView(false), transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, transitionInterpolator: new deck.FlyToInterpolator() };
-  deckgl.setProps({ initialViewState: vs });
+  deckgl.setProps({ viewState: vs });
   if (innerWidth > 760) q.focus();
 };
 const onTheme = () => { syncTheme(); readTokens(); update(); };
