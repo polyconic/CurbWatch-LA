@@ -256,11 +256,11 @@ details.src p{margin:6px 0 0}
       <div class="brandbtns">
         <button class="iconbtn" id="theme" type="button" aria-label="Switch theme" title="Switch theme">
           <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg>
-          <!-- the crescent's ink sits low-left of its bounding box, so the viewBox carries an optical offset -->
-          <svg class="moon" viewBox="-1.5 1.5 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M20.5 14.3A8.6 8.6 0 0 1 9.7 3.5a8.6 8.6 0 1 0 10.8 10.8z"/></svg>
+          <!-- crescent built so its outer disc is exactly r9 about (12,12), like the sun's circle and the reset arc -->
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z"/></svg>
         </button>
         <button class="iconbtn" id="reset" type="button" aria-label="Reset the map" title="Reset">
-          <svg viewBox="-0.7 -0.6 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 12a8.8 8.8 0 1 0 2.6-6.2"/><path d="M3 3.4V9h5.6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 12a8.8 8.8 0 1 0 2.6-6.2"/><path d="M3 3.4V9h5.6"/></svg>
         </button>
         <button class="chip railtoggle" id="railToggle" aria-expanded="false">Options</button>
       </div>
