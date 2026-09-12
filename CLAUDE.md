@@ -6,10 +6,10 @@ the working document.
 
 Not deployed yet. Planned as a website (GitHub Pages like Greg's other sites), maybe an
 app later — `site.webmanifest` already makes it installable. Greg is designing the
-visual identity. `FAVICON2.png` (512×512) is his and is the only icon — favicon,
-apple-touch-icon and manifest all point at it. `og-image.png` is built from his artwork
-`CURBWATCHLA2.png` by `tools/make_images.py` — trimmed, scaled by a whole number with
-nearest-neighbour (it's pixel art, never resample it) and centred on a 1200x630 canvas.
+visual identity, and both images in the repo are his: `FAVICON2.png` (512×512) is the only
+icon — favicon, apple-touch-icon and manifest all point at it — and `og-image.png`
+(1200×630) is the social card. Replace either by overwriting the file; nothing generates
+them. Keep og-image.png at 1200×630, the ratio link previews expect.
 
 ## Layout
 
