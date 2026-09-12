@@ -56,10 +56,7 @@
 }
 </script>
 
-<link rel="preload" href="vendor/fonts/fraunces-500-700.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="vendor/fonts/figtree-400-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="curb-data.js" as="script">
-<link rel="stylesheet" href="vendor/fonts.css">
 <style>
 :root{
   --ground:#EEEAE1; --panel:#FBFAF6; --panel-2:#F1EEE6; --glass:rgba(251,250,246,.86); --ink:#2A2926; --ink-2:#6B675F; --ink-3:#9A958B; --line:#E2DDD1; --line-2:#EEE9DE;
@@ -67,7 +64,7 @@
   --flock:#8A4FA3; --red:#C8433B; --amber:#C48F2C; --green:#4E8A5A; --blue:#4B6FB0; --unpainted:#B9B3A6; --other:#A39D91; --orange:#D6702F; --moss:#4E7A52;
   --focus:#4E7A52; --shadow:0 1px 2px rgba(42,41,38,.06),0 12px 40px rgba(42,41,38,.14);
   --sign-bg:#FCFBF6; --sign-red:#B9302C; --sign-green:#2E6B44; --sign-blue:#2C55A8;
-  --f-display:"Fraunces",Georgia,"Times New Roman",serif; --f-ui:"Figtree","Helvetica Neue",Arial,system-ui,sans-serif;
+  --f-display:"Helvetica Neue",Helvetica,Arial,sans-serif; --f-ui:"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --ground:#1C1B18; --panel:#26241F; --panel-2:#2F2C26; --glass:rgba(38,36,31,.88); --ink:#EDE9DF; --ink-2:#A9A497; --ink-3:#7D786C; --line:#3B3831; --line-2:#332F29;
@@ -106,7 +103,7 @@ button,input,select{font:inherit;color:inherit}
 .iconbtn .moon{display:none}
 :root[data-theme="dark"] .iconbtn .moon{display:block}
 :root[data-theme="dark"] .iconbtn .sun{display:none}
-.brand h1{margin:0;font:600 30px/1 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 60;letter-spacing:-.01em}
+.brand h1{margin:0;font:700 29px/1 var(--f-display);letter-spacing:-.022em}
 .brand h1 span{color:var(--moss)}
 .brand p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.45}
 .lbl{font:600 11.5px/1 var(--f-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
@@ -122,7 +119,7 @@ button,input,select{font:inherit;color:inherit}
 .chip{border:1px solid transparent;background:var(--panel-2);border-radius:999px;padding:5px 12px;font-size:13px;cursor:pointer;color:var(--ink-2);transition:background .15s,color .15s}
 .chip:hover{color:var(--ink);background:var(--line)}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
-.winsum{font:600 22px/1.1 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 40}
+.winsum{font:700 21px/1.15 var(--f-display);letter-spacing:-.018em}
 .gamenote{font-size:12.5px;color:var(--ink-2);line-height:1.4}
 .dataage{font-size:12px;color:var(--ink-3);line-height:1.4;display:flex;align-items:baseline;gap:6px}
 .dataage b{font-weight:600;color:var(--ink-2)}
@@ -160,12 +157,12 @@ details.src[open] summary::after{content:" ↑"}
 details.src p{margin:6px 0 0}
 /* detail */
 .dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
-.dhead h2{margin:0;font:600 26px/1.05 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 40;text-wrap:balance;letter-spacing:-.01em}
+.dhead h2{margin:0;font:700 25px/1.1 var(--f-display);text-wrap:balance;letter-spacing:-.02em}
 .dhead p{margin:5px 0 0;color:var(--ink-2);font-size:13px}
 .x{border:0;background:var(--panel-2);width:30px;height:30px;border-radius:50%;cursor:pointer;flex:none;font-size:18px;line-height:1;color:var(--ink-2)}
 .x:hover{background:var(--line)}
 .verdict{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:14px;border-left:4px solid}
-.verdict b{font:600 17px/1.15 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 30}
+.verdict b{font:700 16.5px/1.2 var(--f-display);letter-spacing:-.012em}
 .verdict span{font-size:13px;color:var(--ink-2)}
 .verdict .basis{display:block;margin-top:6px;font-size:11.5px;color:var(--ink-3);line-height:1.45}
 .signs{display:flex;flex-direction:column;gap:12px}
@@ -181,7 +178,7 @@ details.src p{margin:6px 0 0}
 .smeta{font-size:12.5px;color:var(--ink-2);margin:6px 4px 0;display:flex;flex-wrap:wrap;gap:3px 10px}
 .smeta .hit{color:var(--red);font-weight:600}
 .smeta .ok{color:var(--green);font-weight:600}
-.h3{font:600 16px/1.2 var(--f-display);font-variation-settings:"SOFT" 100,"opsz" 30;margin:0}
+.h3{font:700 15px/1.2 var(--f-display);letter-spacing:-.008em;margin:0}
 .chart svg{display:block;width:100%;height:auto;overflow:visible}
 .cats{display:grid;grid-template-columns:1fr auto auto;gap:4px 12px;font-size:13px;font-variant-numeric:tabular-nums}
 .cats .k{display:flex;align-items:center;gap:7px}
@@ -577,14 +574,14 @@ function layers() {
   if (fontReady) {
     const lbls = labels.filter(l => z >= 15 || (z >= 13.4 && l.c <= 2) || (l.c <= 1 && z >= 12.5));
     L.push(new D.TextLayer({ id: 'labels', data: lbls, getPosition: d => d.pos, getText: d => d.t, getAngle: d => d.a, getSize: d => d.c <= 2 ? 12.5 : 11.5, sizeUnits: 'pixels',
-      fontFamily: '"Figtree", sans-serif', fontWeight: 600, characterSet: 'auto', getColor: T.label, fontSettings: { sdf: true, fontSize: 48, buffer: 6 }, outlineWidth: 4, outlineColor: A(T['label-halo'], .95),
+      fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 600, characterSet: 'auto', getColor: T.label, fontSettings: { sdf: true, fontSize: 48, buffer: 6 }, outlineWidth: 4, outlineColor: A(T['label-halo'], .95),
       extensions: [new D.CollisionFilterExtension()], collisionEnabled: true, getCollisionPriority: d => (4 - d.c) * 1000 + Math.min(d.len, 999), collisionTestProps: { sizeScale: 2.2 },
       updateTriggers: { getColor: T.ground } }));
-    L.push(new D.TextLayer({ id: 'hoods', data: hoods, visible: z < 15.2, getPosition: d => [d[1], d[2]], getText: d => d[0], getSize: 15, fontFamily: '"Fraunces", serif', fontWeight: 600,
+    L.push(new D.TextLayer({ id: 'hoods', data: hoods, visible: z < 15.2, getPosition: d => [d[1], d[2]], getText: d => d[0], getSize: 15, fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 700,
       characterSet: 'auto', getColor: A(T.ink, T.dark ? .55 : .5), fontSettings: { sdf: true, fontSize: 64, buffer: 8 }, outlineWidth: 5, outlineColor: A(T.ground, .9), getLetterSpacing: 0,
       updateTriggers: { getColor: T.ground } }));
     const lotData = lots.filter(l => S.showLots && (l.k === 'city' ? z >= 12.8 : z >= 15));
-    L.push(new D.TextLayer({ id: 'lots', data: lotData, getPosition: d => d.pos, getText: () => 'P', getSize: d => d.k === 'city' ? 13 : 11, fontFamily: '"Figtree", sans-serif', fontWeight: 800,
+    L.push(new D.TextLayer({ id: 'lots', data: lotData, getPosition: d => d.pos, getText: () => 'P', getSize: d => d.k === 'city' ? 13 : 11, fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 700,
       characterSet: ['P'], getColor: [255, 255, 255], background: true, getBackgroundColor: d => d.k === 'city' ? [27, 79, 184] : d.acc === 'customers' ? [122, 130, 138] : [63, 74, 90],
       backgroundPadding: [4, 1, 4, 1], backgroundBorderRadius: 3, pickable: true }));
   }
@@ -734,8 +731,8 @@ function chartSVG(block) {
     let y = h;
     H[i].forEach((n, c) => { if (!n) return; const bh = n / mx * (h - 4); y -= bh; g += `<rect x="${i * bw + 1.2}" y="${y}" width="${bw - 2.4}" height="${bh}" fill="var(--${['red', 'blue', 'green', 'orange', 'other'][c]})"/>`; });
   }
-  [[0, '12a'], [6, '6a'], [12, '12p'], [18, '6p']].forEach(([i, t]) => g += `<text x="${i * bw + 1}" y="${h + 13}" font-size="10" fill="var(--ink-3)" font-family="Figtree, sans-serif">${t}</text>`);
-  g += `<text x="${W}" y="9" font-size="10" text-anchor="end" fill="var(--ink-3)" font-family="Figtree, sans-serif">${mx} max / hr</text>`;
+  [[0, '12a'], [6, '6a'], [12, '12p'], [18, '6p']].forEach(([i, t]) => g += `<text x="${i * bw + 1}" y="${h + 13}" font-size="10" fill="var(--ink-3)" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">${t}</text>`);
+  g += `<text x="${W}" y="9" font-size="10" text-anchor="end" fill="var(--ink-3)" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">${mx} max / hr</text>`;
   return `<svg viewBox="0 -2 ${W} ${h + 18}" role="img" aria-label="Tickets by hour of day">${g}</svg>`;
 }
 function lotLine(l) {
@@ -961,7 +958,7 @@ $('#sources').innerHTML = `Sources: Dodger Stadium home dates, LADOT meters &amp
 preset('tonight');
 const init = geocode('3800 Ingraham St');
 if (init) query(init.pt[0], init.pt[1], init.label, { base: init.street.base, num: init.num });
-document.fonts.load('600 12px "Figtree"').then(() => document.fonts.load('600 15px "Fraunces"')).catch(() => {}).finally(() => { fontReady = true; redraw(); });
+document.fonts.ready.catch(() => {}).finally(() => { fontReady = true; redraw(); });
 
 // live occupancy (works where the page is allowed to reach data.lacity.org; otherwise the build snapshot stays)
 const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);

@@ -13,12 +13,13 @@ them. Keep og-image.png at 1200×630, the ratio link previews expect.
 
 ## Layout
 
-- `index.html` — the whole app: one file, inline CSS + JS. deck.gl 9.1.14 and the two fonts
-  (Fraunces, Figtree — latin, variable weight, OFL) are self-hosted in `vendor/` so the live
-  site makes no third-party requests; the terms page promises that, keep it true. The basemap
-  is drawn from embedded data (no tiles). Note the Google Fonts URL the page used to carry was
-  malformed (three axes, two-value tuples) and silently 400'd — the fonts never loaded until
-  they were self-hosted.
+- `index.html` — the whole app: one file, inline CSS + JS. deck.gl 9.1.14 is self-hosted in
+  `vendor/`, and type is the system Helvetica stack (Helvetica Neue → Helvetica → Arial), so
+  the live site loads no webfonts and makes no third-party requests — the terms page promises
+  that, keep it true. The basemap is drawn from embedded data (no tiles). Headings carry
+  negative tracking (-.01 to -.022em) since Helvetica sets loose at display sizes. An earlier
+  Fraunces/Figtree pairing was dropped; Greg found the serif ugly, and its Google Fonts URL
+  had been silently 400'ing anyway.
 - `curb-data.js` — `window.CURB = {...}`, ~5 MB, generated. Don't hand-edit.
 - `tools/fetch.py` → `data/raw/*.json` (gitignored), `tools/build.py` → `curb-data.js`.
 - `tools/make_artifact.py` → `data/artifact.html`, a body-only copy for publishing as a

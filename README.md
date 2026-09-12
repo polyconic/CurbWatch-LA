@@ -46,6 +46,6 @@ python3 -m venv .venv && .venv/bin/pip install -r tools/requirements.txt
 Terms differ by layer — see [DATA-LICENSE.md](DATA-LICENSE.md). The OSM-derived parts of
 `curb-data.js` are a derivative database under ODbL 1.0.
 
-Code is MIT (see `LICENSE`); the fonts and deck.gl in `vendor/` are self-hosted so the site makes no third-party requests.
+Code is MIT (see `LICENSE`). Type is the system Helvetica stack and deck.gl is vendored, so the site loads no webfonts and makes no third-party requests.
 
 City data isn't the curb. Red curbs, hydrants, driveways and temporary signs aren't mapped, and the posted sign always wins.
