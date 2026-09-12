@@ -165,8 +165,9 @@ details.src p{margin:6px 0 0}
 .dhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .dhead h2{margin:0;font:700 25px/1.1 var(--f-display);text-wrap:balance;letter-spacing:-.02em}
 .dhead p{margin:5px 0 0;color:var(--ink-2);font-size:13px}
-.x{border:0;background:var(--panel-2);width:30px;height:30px;border-radius:50%;cursor:pointer;flex:none;font-size:18px;line-height:1;color:var(--ink-2)}
+.x{border:0;background:var(--panel-2);width:30px;height:30px;border-radius:50%;cursor:pointer;flex:none;color:var(--ink-2);display:grid;place-items:center;padding:0}
 .x:hover{background:var(--line)}
+.x svg{display:block;width:15px;height:15px}
 .verdict{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border-radius:14px;border-left:4px solid}
 .verdict b{font:700 16.5px/1.2 var(--f-display);letter-spacing:-.012em}
 .verdict span{font-size:13px;color:var(--ink-2)}
@@ -215,8 +216,8 @@ details.src p{margin:6px 0 0}
 .deck-tooltip{font:13px/1.35 var(--f-ui)!important}
 .railtoggle{display:none}
 .dbtns{display:flex;gap:6px;flex:none}
-.sheet{display:none;place-items:center;padding:0}
-.sheet svg{width:16px;height:16px;transition:transform .2s;display:block}
+.sheet{display:none}
+.sheet svg{width:16px;height:16px;transition:transform .2s}
 @media (max-width:760px){
   #rail{left:calc(8px + var(--safe-l));right:calc(8px + var(--safe-r));top:calc(8px + var(--safe-t));width:auto;max-height:calc(52dvh - var(--safe-t))}
   #rail.collapsed .more{display:none}
@@ -803,7 +804,7 @@ const isMobile = () => innerWidth <= 760;
 const Z = { addr: () => isMobile() ? 15.6 : 16.2, street: () => isMobile() ? 14.2 : 14.8, spot: () => isMobile() ? 16.4 : 16.8 };
 // the report link pre-fills the block and what the map said, so a reply only needs what the sign says
 const reportLink = (where, said) => `<span class="report">Incorrect? <a href="mailto:hello@curbwatch.la?subject=${encodeURIComponent('CurbWatch LA correction: ' + where)}&body=${encodeURIComponent('Block: ' + where + '\nThe map says: ' + said + '\nThe sign says: ')}">Report it</a></span>`;
-const DBTNS = `<div class="dbtns"><button class="x sheet" id="sheet" type="button" aria-label="Show more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="x" id="close" aria-label="Close">×</button></div>`;
+const DBTNS = `<div class="dbtns"><button class="x sheet" id="sheet" type="button" aria-label="Show more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="x" id="close" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>`;
 function applySheet() {
   const el = $('#detail'), peek = isMobile() && !S.sheetOpen;
   el.classList.toggle('peek', peek);
