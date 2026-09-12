@@ -168,6 +168,9 @@ details.src p{margin:6px 0 0}
 .verdict b{font:700 16.5px/1.2 var(--f-display);letter-spacing:-.012em}
 .verdict span{font-size:13px;color:var(--ink-2)}
 .verdict .basis{display:block;margin-top:6px;font-size:11.5px;color:var(--ink-3);line-height:1.45}
+.verdict .report{display:block;margin-top:8px;font-size:12px;color:var(--ink-3)}
+.verdict .report a{color:var(--moss);font-weight:600;text-decoration:none}
+.verdict .report a:hover{text-decoration:underline}
 .signs{display:flex;flex-direction:column;gap:12px}
 .sign{background:var(--sign-bg);color:var(--sign-red);border-radius:10px;padding:5px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 3px 10px rgba(0,0,0,.08)}
 .sign .in{border:1.5px solid currentColor;border-radius:7px;padding:9px 10px 8px;text-align:center;font-family:var(--f-ui);text-transform:uppercase;line-height:1.05;letter-spacing:.02em}
@@ -793,6 +796,8 @@ function lotLine(l) {
   return [l.k === 'garage' ? 'Garage' : 'Lot', l.acc === 'customers' ? 'customers only' : l.acc === 'yes' ? 'public' : '', l.fee === 'yes' ? 'paid' : l.fee === 'no' ? 'free' : '', l.s ? l.s + ' spaces' : '', l.h].filter(Boolean).join(' · ');
 }
 const isMobile = () => innerWidth <= 760;
+// the report link pre-fills the block and what the map said, so a reply only needs what the sign says
+const reportLink = (where, said) => `<span class="report">Incorrect? <a href="mailto:hello@curbwatch.la?subject=${encodeURIComponent('CurbWatch LA correction: ' + where)}&body=${encodeURIComponent('Block: ' + where + '\nThe map says: ' + said + '\nThe sign says: ')}">Report it</a></span>`;
 const DBTNS = `<div class="dbtns"><button class="x sheet" id="sheet" type="button" aria-label="Show more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="x" id="close" aria-label="Close">×</button></div>`;
 function applySheet() {
   const el = $('#detail'), peek = isMobile() && !S.sheetOpen;
@@ -811,7 +816,7 @@ function renderDetail() {
     el.innerHTML = `
       <div class="sec">
         <div class="dhead"><div><h2>Beverly Hills</h2><p>Outside this map’s coverage</p></div>${DBTNS}</div>
-        <div class="verdict" style="border-color:rgb(${T['ink-3'].join(',')});background:rgba(${T['ink-3'].join(',')},.10)"><b>No data for this block</b><span>CurbWatch covers the City of Los Angeles and West Hollywood. Beverly Hills runs its own parking rules and doesn’t publish them, so this map can’t tell you anything about this curb — read the posted sign.</span></div>
+        <div class="verdict" style="border-color:rgb(${T['ink-3'].join(',')});background:rgba(${T['ink-3'].join(',')},.10)"><b>No data for this block</b><span>CurbWatch covers the City of Los Angeles and West Hollywood. Beverly Hills runs its own parking rules and doesn’t publish them, so this map can’t tell you anything about this curb — read the posted sign.</span>${reportLink('Beverly Hills', 'No data for this block')}</div>
       </div>
       ${cams.length ? `<div class="sec"><div class="lbl">Plate readers within 400 m</div><div class="list">${cams.map(([c, d]) => `<button class="li" data-cam="${alpr.indexOf(c)}"><span class="cm ${c.flock ? '' : 'o'}"></span><span>${c.flock ? 'Flock Safety' : esc(c.mfr || 'Unknown maker')}<small>${c.dirs.length ? 'Faces ' + c.dirs.map(compass).join(' & ') : 'Direction not mapped'}${c.op ? ' · ' + esc(c.op) : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('')}</div>
       <div class="fine">Cameras are mapped by volunteers in OpenStreetMap and aren’t city data, so they show up everywhere — including here.</div></div>` : ''}`;
@@ -885,7 +890,7 @@ function renderDetail() {
   el.innerHTML = `
     <div class="sec">
       <div class="dhead"><div><h2>${esc(s.label)}</h2><p>${esc(b ? blockTitle(b) + ' · ' : '')}${cityTxt}</p></div>${DBTNS}</div>
-      <div class="verdict" style="border-color:rgb(${v[0].join(',')});background:rgba(${v[0].join(',')},.10)"><b>${esc(v[1])}</b><span>${esc(winTxt)} · ${esc(v[2])}</span><span class="basis">What the city published and what was ticketed before — not a promise about today. Red curbs, hydrants and temporary signs are in no dataset, and the posted sign is the authority.</span></div>
+      <div class="verdict" style="border-color:rgb(${v[0].join(',')});background:rgba(${v[0].join(',')},.10)"><b>${esc(v[1])}</b><span>${esc(winTxt)} · ${esc(v[2])}</span><span class="basis">What the city published and what was ticketed before — not a promise about today. Red curbs, hydrants and temporary signs are in no dataset, and the posted sign is the authority.</span>${reportLink(s.label + (b ? ' (' + blockTitle(b) + ')' : ''), v[1])}</div>
     </div>
     <div class="sec"><div class="lbl">What the signs say</div><div class="signs">${signs.join('')}</div></div>
     ${b ? `<div class="sec"><h3 class="h3">${tot} ticket${tot === 1 ? '' : 's'} on this block since ${fmtISO(C.citeRange[0])}</h3>
