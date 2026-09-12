@@ -240,7 +240,6 @@ details.src p{margin:6px 0 0}
       <input id="q" type="search" placeholder="Search an address" autocomplete="off" aria-label="Search an address or street">
       <div class="sugg" id="sugg" hidden></div>
     </div>
-    <div class="chips" id="saved"></div>
   </div>
   <div class="sec more">
     <div class="lbl">When you’re parking</div>
@@ -945,9 +944,6 @@ q.onkeydown = e => {
 };
 sugg.onmousedown = e => { const b = e.target.closest('button'); if (b) { e.preventDefault(); go(sList[+b.dataset.i].text); } };
 q.onblur = () => setTimeout(() => sugg.hidden = true, 100);
-const SAVED = ['3800 Ingraham St', '8800 Sunset Blvd', '1600 Vine St', '1500 Echo Park Ave'];
-$('#saved').innerHTML = SAVED.map(s => `<button class="chip">${s}</button>`).join('');
-$('#saved').onclick = e => { if (e.target.tagName === 'BUTTON') go(e.target.textContent); };
 
 // ---------- map setup
 readTokens();
