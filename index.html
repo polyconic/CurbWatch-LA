@@ -208,12 +208,32 @@ details.src p{margin:6px 0 0}
 .attr{position:fixed;left:16px;bottom:8px;font-size:11px;color:var(--ink-3);z-index:1;pointer-events:none}
 .deck-tooltip{font:13px/1.35 var(--f-ui)!important}
 .railtoggle{display:none}
+.dbtns{display:flex;gap:6px;flex:none}
+.sheet{display:none}
+.sheet svg{width:16px;height:16px;transition:transform .2s}
 @media (max-width:760px){
   #rail{left:8px;right:8px;top:8px;width:auto;max-height:52dvh}
   #rail.collapsed .more{display:none}
   .railtoggle{display:inline-block}
-  #detail{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:56dvh}
+  .brand h1{font-size:24px}
+  /* the rail scrolls, so a floating dropdown gets clipped — let it flow and grow the panel instead */
+  .sugg{position:static;margin-top:6px;box-shadow:none}
+  /* once a block is selected the rail shrinks to brand + search so the map gets the room */
+  body.has-sel #rail .brand-p{display:none}
+  body.has-sel #rail .brand h1{font-size:19px}
+  body.has-sel #rail .brand{align-items:center}
+  body.has-sel #rail .brandbtns{margin-top:0}
+  body.has-sel #rail .sec:first-child{padding:10px 14px 12px;gap:8px}
+  body.has-sel #rail .search input{height:38px}
+  /* the detail panel is a bottom sheet: peek shows the verdict, tap the header or chevron for the rest */
+  #detail{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:74dvh}
+  #detail.peek .sec:not(:first-child),#detail.peek .basis{display:none}
+  #detail .dhead{cursor:pointer}
+  #detail .dhead h2{font-size:21px}
+  .sheet{display:grid}
+  #detail:not(.peek) .sheet svg{transform:rotate(180deg)}
   .zoom{display:none}
+  body.has-sel .attr{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -721,6 +741,8 @@ function query(lon, lat, label, hint) {
   if (useBlock) hl.push(block.path);
   wp.slice(0, 1).forEach(w => hl.push(w.path));
   S.sel = { pt: [lon, lat], hl, inBH, block: inBH ? null : (useBlock ? block : null), wp: wp.slice(0, 2), ws: ws.slice(0, 2), inWeho, mets, lots: lotsNear, cams, ppd: [...new Set(ppdIds)], wDist, label: lbl };
+  S.sheetOpen = false;
+  if (isMobile() && S.touched) { $('#rail').classList.add('collapsed'); $('#railToggle').setAttribute('aria-expanded', 'false'); }
   renderDetail(); redraw();
 }
 
@@ -770,20 +792,31 @@ function lotLine(l) {
   if (l.src === 'WeHo') return [l.a, l.s ? l.s + ' spaces' : '', 'City of West Hollywood'].filter(Boolean).join(' · ');
   return [l.k === 'garage' ? 'Garage' : 'Lot', l.acc === 'customers' ? 'customers only' : l.acc === 'yes' ? 'public' : '', l.fee === 'yes' ? 'paid' : l.fee === 'no' ? 'free' : '', l.s ? l.s + ' spaces' : '', l.h].filter(Boolean).join(' · ');
 }
+const isMobile = () => innerWidth <= 760;
+const DBTNS = `<div class="dbtns"><button class="x sheet" id="sheet" type="button" aria-label="Show more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button><button class="x" id="close" aria-label="Close">×</button></div>`;
+function applySheet() {
+  const el = $('#detail'), peek = isMobile() && !S.sheetOpen;
+  el.classList.toggle('peek', peek);
+  document.body.classList.toggle('has-sel', !!(S.sel && S.touched));  // the opening example keeps the tagline; the rail shrinks once you've searched or tapped
+  const flip = () => { S.sheetOpen = !S.sheetOpen; applySheet(); };
+  const b = $('#sheet'); if (b) { b.onclick = flip; b.setAttribute('aria-label', peek ? 'Show more' : 'Show less'); }
+  const h = el.querySelector('.dhead'); if (h) h.onclick = e => { if (isMobile() && !e.target.closest('button')) flip(); };
+  const x = $('#close'); if (x) x.onclick = clearSel;
+}
+addEventListener('resize', () => { if (S.sel) applySheet(); });
 function renderDetail() {
   const s = S.sel, el = $('#detail'); if (!s) { el.hidden = true; return; }
   if (s.inBH) {
     const cams = S.showAlpr ? s.cams : [];
     el.innerHTML = `
       <div class="sec">
-        <div class="dhead"><div><h2>Beverly Hills</h2><p>Outside this map’s coverage</p></div><button class="x" id="close" aria-label="Close">×</button></div>
+        <div class="dhead"><div><h2>Beverly Hills</h2><p>Outside this map’s coverage</p></div>${DBTNS}</div>
         <div class="verdict" style="border-color:rgb(${T['ink-3'].join(',')});background:rgba(${T['ink-3'].join(',')},.10)"><b>No data for this block</b><span>CurbWatch covers the City of Los Angeles and West Hollywood. Beverly Hills runs its own parking rules and doesn’t publish them, so this map can’t tell you anything about this curb — read the posted sign.</span></div>
       </div>
       ${cams.length ? `<div class="sec"><div class="lbl">Plate readers within 400 m</div><div class="list">${cams.map(([c, d]) => `<button class="li" data-cam="${alpr.indexOf(c)}"><span class="cm ${c.flock ? '' : 'o'}"></span><span>${c.flock ? 'Flock Safety' : esc(c.mfr || 'Unknown maker')}<small>${c.dirs.length ? 'Faces ' + c.dirs.map(compass).join(' & ') : 'Direction not mapped'}${c.op ? ' · ' + esc(c.op) : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('')}</div>
       <div class="fine">Cameras are mapped by volunteers in OpenStreetMap and aren’t city data, so they show up everywhere — including here.</div></div>` : ''}`;
     el.hidden = false;
-    renderGameNote();
-    $('#close').onclick = clearSel;
+    renderGameNote(); applySheet();
     el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
     return;
   }
@@ -851,7 +884,7 @@ function renderDetail() {
   const lotsHTML = s.lots.map(([l, d]) => `<button class="li" data-lot="${lots.indexOf(l)}"><span class="p ${l.k === 'city' ? '' : l.acc === 'customers' ? 'c' : 'o'}">P</span><span>${esc(l.n || (l.k === 'garage' ? 'Parking garage' : 'Parking lot'))}<small>${esc(lotLine(l))}${l.src === 'LADOT' && l.sf ? ' · ' + esc(l.sf.slice(0, 110)) + (l.sf.length > 110 ? '…' : '') : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('');
   el.innerHTML = `
     <div class="sec">
-      <div class="dhead"><div><h2>${esc(s.label)}</h2><p>${esc(b ? blockTitle(b) + ' · ' : '')}${cityTxt}</p></div><button class="x" id="close" aria-label="Close">×</button></div>
+      <div class="dhead"><div><h2>${esc(s.label)}</h2><p>${esc(b ? blockTitle(b) + ' · ' : '')}${cityTxt}</p></div>${DBTNS}</div>
       <div class="verdict" style="border-color:rgb(${v[0].join(',')});background:rgba(${v[0].join(',')},.10)"><b>${esc(v[1])}</b><span>${esc(winTxt)} · ${esc(v[2])}</span><span class="basis">What the city published and what was ticketed before — not a promise about today. Red curbs, hydrants and temporary signs are in no dataset, and the posted sign is the authority.</span></div>
     </div>
     <div class="sec"><div class="lbl">What the signs say</div><div class="signs">${signs.join('')}</div></div>
@@ -862,8 +895,7 @@ function renderDetail() {
     ${S.showAlpr ? `<div class="sec"><div class="lbl">Plate readers within 400 m</div>${s.cams.length ? `<div class="list">${s.cams.map(([c, d]) => `<button class="li" data-cam="${alpr.indexOf(c)}"><span class="cm ${c.flock ? '' : 'o'}"></span><span>${c.flock ? 'Flock Safety' : esc(c.mfr || 'Unknown maker')}<small>${c.dirs.length ? 'Faces ' + c.dirs.map(compass).join(' & ') : 'Direction not mapped'}${c.op ? ' · ' + esc(c.op) : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('')}</div>` : '<div class="note">None mapped nearby.</div>'}
       <div class="fine">Community-mapped in OpenStreetMap, the same data DeFlock shows, so coverage is incomplete.</div></div>` : ''}`;
   el.hidden = false;
-  renderGameNote();
-  $('#close').onclick = clearSel;
+  renderGameNote(); applySheet();
   el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
   el.querySelectorAll('[data-lot]').forEach(n => n.onclick = () => { const l = lots[+n.dataset.lot]; fly(l.pos, 17); });
 }
@@ -951,12 +983,13 @@ function go(text) {
   const g = geocode(text);
   sugg.hidden = true;
   if (!g) { q.setCustomValidity('Not found'); q.reportValidity(); setTimeout(() => q.setCustomValidity(''), 1500); return; }
-  q.value = g.label; fly(g.pt, g.num != null ? 17.2 : 15.5); query(g.pt[0], g.pt[1], g.label, g.num != null ? { base: g.street.base, num: g.num } : null);
+  q.value = g.label; if (isMobile()) q.blur(); S.touched = true;
+  fly(g.pt, g.num != null ? (isMobile() ? 16.5 : 17.2) : (isMobile() ? 14.8 : 15.5)); query(g.pt[0], g.pt[1], g.label, g.num != null ? { base: g.street.base, num: g.num } : null);
   setURL('?q=' + encodeURIComponent(g.label));
 }
 // searches are linkable (?q=1157 Lemoyne St); the 404 page's search box lands here too
 const setURL = s => { try { history.replaceState(null, '', s); } catch (e) {} };
-function clearSel() { S.sel = null; $('#detail').hidden = true; renderGameNote(); redraw(); setURL(location.pathname); }
+function clearSel() { S.sel = null; $('#detail').hidden = true; applySheet(); renderGameNote(); redraw(); setURL(location.pathname); }
 q.oninput = () => {
   sList = suggestions(q.value); sIdx = -1;
   sugg.innerHTML = sList.map((s, i) => `<button data-i="${i}">${esc(s.text)}<small>${s.range}</small></button>`).join('');
@@ -964,7 +997,8 @@ q.oninput = () => {
 };
 q.onkeydown = e => {
   if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { if (!sList.length) return; e.preventDefault(); sIdx = (sIdx + (e.key === 'ArrowDown' ? 1 : -1) + sList.length) % sList.length; sugg.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === sIdx)); }
-  if (e.key === 'Enter') { e.preventDefault(); go(sIdx >= 0 ? sList[sIdx].text : q.value); }
+  // Enter on a half-typed street takes the top suggestion rather than failing on the partial
+  if (e.key === 'Enter') { e.preventDefault(); go(sIdx >= 0 ? sList[sIdx].text : (sList.length && !geocode(q.value)) ? sList[0].text : q.value); }
   if (e.key === 'Escape') sugg.hidden = true;
 };
 sugg.onmousedown = e => { const b = e.target.closest('button'); if (b) { e.preventDefault(); go(sList[+b.dataset.i].text); } };
@@ -984,7 +1018,9 @@ function fitView(withDetail) {
 }
 let vs = fitView(true); viewZoom = vs.zoom;
 function fly(pt, zoom) {
-  vs = { ...vs, longitude: pt[0] + (innerWidth > 900 ? 0.0009 * Math.pow(2, 17 - zoom) : 0), latitude: pt[1] - (innerWidth <= 760 ? 0.0006 * Math.pow(2, 17 - zoom) : 0), zoom, transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900, transitionInterpolator: new deck.FlyToInterpolator() };
+  // on phones the peek sheet covers more of the bottom than the compact rail does the top, so land the point ~40px above centre
+  const dy = isMobile() ? 40 * 129770 / Math.pow(2, zoom) / KY : 0;
+  vs = { ...vs, longitude: pt[0] + (innerWidth > 900 ? 0.0009 * Math.pow(2, 17 - zoom) : 0), latitude: pt[1] - dy, zoom, transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900, transitionInterpolator: new deck.FlyToInterpolator() };
   deckgl.setProps({ viewState: vs });
 }
 let zb = Math.round(viewZoom * 5), mapUp = false;
@@ -995,7 +1031,7 @@ deckgl = new deck.Deck({
   // controlled view state: deck ignores an initialViewState equal to the last one, which made a
   // second reset after a manual zoom do nothing
   onViewStateChange: ({ viewState }) => { vs = viewState; deckgl.setProps({ viewState: vs }); viewZoom = viewState.zoom; const nb = Math.round(viewZoom * 5); if (nb !== zb) { zb = nb; redraw(); } },
-  onClick: info => { if (!info.coordinate) return; const [lon, lat] = info.coordinate; if (info.layer && info.layer.id === 'lots' && info.object) { query(...info.object.pos, info.object.n || null); return; } query(lon, lat); },
+  onClick: info => { if (!info.coordinate) return; S.touched = true; const [lon, lat] = info.coordinate; if (info.layer && info.layer.id === 'lots' && info.object) { query(...info.object.pos, info.object.n || null); return; } query(lon, lat); },
   onLoad: () => { mapUp = true; $('#loading').hidden = true; },
   onError: e => { console.error(e); noWebGL(); },
   style: { background: 'var(--ground)' }
