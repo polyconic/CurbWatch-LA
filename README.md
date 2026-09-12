@@ -13,9 +13,11 @@ Elysian Park west to Doheny, Franklin down to roughly Pico. Labelled on the map:
 | **West** | Mid-Wilshire, Fairfax, Beverly Grove, West Hollywood |
 
 Also inside the covered area, unlabelled: Thai Town, Little Armenia, Historic Filipinotown,
-Rampart Village, Melrose, Carthay, and the edge of Beverly Hills — which carries no parking
-data here, being its own city. West Hollywood is too, and has its own rules; it's drawn with
-a dashed boundary and uses the city's own permit and sweeping schedules.
+Rampart Village, Melrose and Carthay. West Hollywood is a separate city with its own rules;
+it's drawn with a dashed boundary and uses the city's own permit and sweeping schedules.
+
+Beverly Hills falls inside the map's frame but outside its coverage — it publishes none of
+this data, so it's greyed out and a click there says so rather than implying the curb is free.
 
 ## Running it
 

@@ -277,7 +277,7 @@ details.src p{margin:6px 0 0}
   </div>
   <div class="sec more">
     <p class="fine" style="margin:0">Drawn from city data, not the curb itself: red curbs, hydrants, driveways and temporary signs aren’t mapped, and the posted sign always wins. LA hasn’t published its permit-district map since 2015, so LA permit streets appear only where permit tickets were written at that block’s own address; holidays suspend LA sweeping.</p>
-    <p class="fine" style="margin:0"><a href="terms.html">Terms &amp; data notes</a> — where this comes from, how current it is, and what it can’t see. Wrong block? <a href="mailto:hello@curbwatch.com?subject=CurbWatch%20LA%20correction">Tell us</a>.</p>
+    <p class="fine" style="margin:0"><a href="terms.html">Terms &amp; data notes</a> — where this comes from, how current it is, and what it can’t see. Wrong block? <a href="mailto:hello@curbwatch.la?subject=CurbWatch%20LA%20correction">Tell us</a>.</p>
     <details class="src"><summary>Sources</summary><p class="fine" id="sources"></p></details>
     <span id="meterNote" hidden></span>
   </div>
@@ -307,6 +307,7 @@ const roads = C.roads.map(r => ({ c: r[0], path: dec(r, 1) }));
 const labels = C.labels.map(l => ({ pos: P(l), a: l[2], c: l[3], t: l[4], len: l[5] }));
 const green = C.green.map(g => ({ k: g[0], poly: dec(g, 1) }));
 const wehoOutline = C.weho.map(r => dec(r));
+const bhOutline = (C.bh || []).map(r => dec(r));
 const routes = C.routes.map(r => ({ code: r[0], mask: r[1], t0: r[2], t1: r[3], wk: r[4], bounds: r[5] }));
 const ppd = C.ppd.map(p => ({ id: p[0], poly: dec(p, 1) }));
 const wehoDistricts = C.wehoDistricts.map(p => ({ id: p[0], poly: dec(p, 1) }));
@@ -562,6 +563,8 @@ function layers() {
       capRounded: true, jointRounded: true, updateTriggers: { getColor: T.ground } }),
     new D.PathLayer({ id: 'roads-major', data: roadsMajor, getPath: d => d.path, getColor: d => roadCol(d.c), getWidth: d => RW[d.c], widthUnits: 'meters', widthMinPixels: 1.6,
       capRounded: true, jointRounded: true, updateTriggers: { getColor: T.ground } }),
+    new D.SolidPolygonLayer({ id: 'bh-mask', data: bhOutline, getPolygon: d => d, getFillColor: A(T.ground, T.dark ? .72 : .78), updateTriggers: { getFillColor: T.ground } }),
+    new D.PathLayer({ id: 'bh-line', data: bhOutline, getPath: d => d, getColor: A(T['ink-3'], .5), getWidth: 1.2, widthUnits: 'pixels', updateTriggers: { getColor: T.ground } }),
     new D.PathLayer({ id: 'weho-line', data: wehoOutline, getPath: d => d, getColor: A(T['ink-3'], .7), getWidth: 1.4, widthUnits: 'pixels', getDashArray: [4, 3],
       updateTriggers: { getColor: T.ground } }),
     new D.PathLayer({ id: 'overlay', data: overlay, getPath: d => d.path, getColor: colorFor, getWidth: 7, widthUnits: 'meters', widthMinPixels: z < 13 ? 1.2 : 1.8, widthMaxPixels: 9,
@@ -685,6 +688,7 @@ function query(lon, lat, label, hint) {
   wp = wp.sort((a, b) => a[1] - b[1]).map(x => x[0]);
   const ws = near(gWS, wehoSweep, lon, lat).map(w => [w, pathDist(pm, w.path)]).filter(x => x[1] < 30).sort((a, b) => a[1] - b[1]).map(x => x[0]);
   const inWeho = wehoOutline.some(r => inPoly([lon, lat], r));
+  const inBH = !inWeho && bhOutline.some(r => inPoly([lon, lat], r));
   const mets = near(gMet, meters, lon, lat).map(m => [m, Math.hypot(toM(...m.pos)[0] - pm[0], toM(...m.pos)[1] - pm[1])]).filter(x => x[1] < 70).sort((a, b) => a[1] - b[1]).map(x => x[0]);
   const lotsNear = lots.map(l => [l, Math.hypot(toM(...l.pos)[0] - pm[0], toM(...l.pos)[1] - pm[1])]).filter(x => x[1] < 650).sort((a, b) => (a[1] - (a[0].k === 'city' ? 150 : 0)) - (b[1] - (b[0].k === 'city' ? 150 : 0))).slice(0, 5);
   const cams = alpr.map(c => [c, Math.hypot(toM(...c.pos)[0] - pm[0], toM(...c.pos)[1] - pm[1])]).filter(x => x[1] < 400).sort((a, b) => a[1] - b[1]).slice(0, 6);
@@ -696,7 +700,7 @@ function query(lon, lat, label, hint) {
   const hl = [];
   if (useBlock) hl.push(block.path);
   wp.slice(0, 1).forEach(w => hl.push(w.path));
-  S.sel = { pt: [lon, lat], hl, block: useBlock ? block : null, wp: wp.slice(0, 2), ws: ws.slice(0, 2), inWeho, mets, lots: lotsNear, cams, ppd: [...new Set(ppdIds)], wDist, label: lbl };
+  S.sel = { pt: [lon, lat], hl, inBH, block: inBH ? null : (useBlock ? block : null), wp: wp.slice(0, 2), ws: ws.slice(0, 2), inWeho, mets, lots: lotsNear, cams, ppd: [...new Set(ppdIds)], wDist, label: lbl };
   renderDetail(); redraw();
 }
 
@@ -748,6 +752,21 @@ function lotLine(l) {
 }
 function renderDetail() {
   const s = S.sel, el = $('#detail'); if (!s) { el.hidden = true; return; }
+  if (s.inBH) {
+    const cams = S.showAlpr ? s.cams : [];
+    el.innerHTML = `
+      <div class="sec">
+        <div class="dhead"><div><h2>Beverly Hills</h2><p>Outside this map’s coverage</p></div><button class="x" id="close" aria-label="Close">×</button></div>
+        <div class="verdict" style="border-color:rgb(${T['ink-3'].join(',')});background:rgba(${T['ink-3'].join(',')},.10)"><b>No data for this block</b><span>CurbWatch covers the City of Los Angeles and West Hollywood. Beverly Hills runs its own parking rules and doesn’t publish them, so this map can’t tell you anything about this curb — read the posted sign.</span></div>
+      </div>
+      ${cams.length ? `<div class="sec"><div class="lbl">Plate readers within 400 m</div><div class="list">${cams.map(([c, d]) => `<button class="li" data-cam="${alpr.indexOf(c)}"><span class="cm ${c.flock ? '' : 'o'}"></span><span>${c.flock ? 'Flock Safety' : esc(c.mfr || 'Unknown maker')}<small>${c.dirs.length ? 'Faces ' + c.dirs.map(compass).join(' & ') : 'Direction not mapped'}${c.op ? ' · ' + esc(c.op) : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('')}</div>
+      <div class="fine">Cameras are mapped by volunteers in OpenStreetMap and aren’t city data, so they show up everywhere — including here.</div></div>` : ''}`;
+    el.hidden = false;
+    renderGameNote();
+    $('#close').onclick = () => { S.sel = null; el.hidden = true; renderGameNote(); redraw(); };
+    el.querySelectorAll('[data-cam]').forEach(n => n.onclick = () => fly(alpr[+n.dataset.cam].pos, 17.5));
+    return;
+  }
   const b = s.block, a = S.t0, e = Math.max(S.t1, S.t0 + 15 * MIN);
   const signs = []; let hitSweep = false, hitPermit = false, caution = [];
   if (b && b.routes.length) signSweep(b.routes.map(i => routes[i])).forEach(x => { signs.push(x.html); hitSweep ||= x.hit; });

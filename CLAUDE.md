@@ -64,6 +64,10 @@ and the `blocks` decode in `index.html` before changing either.
   that Sunset Bl restrictions change on game days (temporary tow-away along the stadium
   approach), which is posted signage, not in any dataset. `renderGameNote()` must be called
   wherever the selection changes, not just from `update()`.
+- Beverly Hills sits inside the bbox but publishes none of this. Its boundary ships as `bh`
+  in the data; the map greys it out and a click there gets an out-of-coverage panel instead of
+  a verdict — saying "nothing restricts this" about a city we have no data for was a lie.
+  Cameras still show there (OSM covers it).
 - WeHo data is the city's own and has posted hours — trust it over inference.
 - LA sweeping routes are polygons with paired routes (e.g. `5P223 Th` / `5P223 F`):
   one side each day, and the data doesn't say which side.

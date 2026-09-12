@@ -108,6 +108,14 @@ for r in [f for f in cities if f['attributes']['CITY_NAME'] == 'West Hollywood']
     if s and Polygon([proj(*p) for p in s]).area > 20000: weho_rings.append(enc(s))
 D['weho'] = weho_rings
 
+# Beverly Hills is inside the bbox but outside coverage — it publishes none of this, so the app
+# marks it out of coverage rather than implying its curbs are unrestricted.
+bh_rings = []
+for r in [f for f in cities if f['attributes']['CITY_NAME'] == 'Beverly Hills'][0]['geometry']['rings']:
+    s2 = simp_ring(r, 3)
+    if s2 and Polygon([proj(*p) for p in s2]).area > 20000: bh_rings.append(enc(s2))
+D['bh'] = bh_rings
+
 # ---------- LA sweep routes
 DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
 def tmin(s):
