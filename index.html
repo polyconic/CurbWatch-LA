@@ -1006,7 +1006,11 @@ new MutationObserver(onTheme).observe(document.documentElement, { attributes: tr
 $('#sources').innerHTML = `Sources: Dodger Stadium home dates, LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISO(C.permitRange[0])} 2025), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
 
 
-preset('tonight');  // opens blank: no selection, no right panel, whole area in view
+preset('tonight');
+// open on one block as a worked example — Lemoyne has sweeping, meters and a permit street
+// that isn't on LA's 2015 map, so the panel shows what this thing actually does
+const init = geocode('1157 Lemoyne St');
+if (init) query(init.pt[0], init.pt[1], init.label, { base: init.street.base, num: init.num });
 document.fonts.ready.catch(() => {}).finally(() => { fontReady = true; redraw(); });
 
 // live occupancy (works where the page is allowed to reach data.lacity.org; otherwise the build snapshot stays)

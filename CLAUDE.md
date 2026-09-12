@@ -41,6 +41,12 @@ and the `blocks` decode in `index.html` before changing either.
 - Camera layer is labelled "Plate readers", not by any manufacturer — a quarter of them aren't
   Flock, and a tip-jar site shouldn't wear one company's trademark as a feature name.
 
+The page opens on 1157 Lemoyne St as a worked example — Echo Park's 1100 block, 1,193 tickets
+in six months, with sweeping, meters and a permit street that isn't on LA's 2015 map, so the
+panel shows every kind of thing this does at once. The highest-ticket blocks in the data
+(W 6th St 300, S Normandie 650) are Wilshire bus lanes — "exclusive for buses" camera tickets,
+not parking, so they make a misleading first impression.
+
 ## Data decisions (hard-won — read before changing)
 
 - **No LA permit-district polygons.** LADOT's only published PPD map is from Aug 2015 and
