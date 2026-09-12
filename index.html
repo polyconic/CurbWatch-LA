@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CurbWatch LA · Street parking rules from Echo Park to West Hollywood</title>
 <meta name="description" content="Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.">
-<link rel="canonical" href="https://curbwatch.example/">
+<link rel="canonical" href="https://curbwatch.la/">
 <meta name="robots" content="index, follow, max-image-preview:large">
 <meta name="theme-color" content="#EEEAE1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1C1B18" media="(prefers-color-scheme: dark)">
@@ -15,8 +15,8 @@
 <meta property="og:site_name" content="CurbWatch LA">
 <meta property="og:title" content="CurbWatch LA">
 <meta property="og:description" content="Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.">
-<meta property="og:url" content="https://curbwatch.example/">
-<meta property="og:image" content="https://curbwatch.example/og-image.png">
+<meta property="og:url" content="https://curbwatch.la/">
+<meta property="og:image" content="https://curbwatch.la/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
@@ -25,7 +25,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="CurbWatch LA">
 <meta name="twitter:description" content="Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.">
-<meta name="twitter:image" content="https://curbwatch.example/og-image.png">
+<meta name="twitter:image" content="https://curbwatch.la/og-image.png">
 <meta name="twitter:image:alt" content="Curb Watch Los Angeles, in pixel lettering on a dark ground">
 
 <link rel="icon" href="FAVICON2.png" sizes="512x512" type="image/png">
@@ -40,7 +40,7 @@
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "CurbWatch LA",
-  "url": "https://curbwatch.example/",
+  "url": "https://curbwatch.la/",
   "description": "Check any block from Echo Park to West Hollywood before you park: street-sweeping days, permit streets, Dodger game-day zones, meters and where tickets actually get written.",
   "applicationCategory": "TravelApplication",
   "operatingSystem": "Any",
@@ -56,11 +56,10 @@
 }
 </script>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preload" href="vendor/fonts/fraunces-500-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="vendor/fonts/figtree-400-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="curb-data.js" as="script">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,500;9..144,600;9..144,700,100&family=Figtree:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="vendor/fonts.css">
 <style>
 :root{
   --ground:#EEEAE1; --panel:#FBFAF6; --panel-2:#F1EEE6; --glass:rgba(251,250,246,.86); --ink:#2A2926; --ink-2:#6B675F; --ink-3:#9A958B; --line:#E2DDD1; --line-2:#EEE9DE;
@@ -91,6 +90,8 @@ body{margin:0;background:var(--ground);color:var(--ink);font:14.5px/1.45 var(--f
 button,input,select{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 #map{position:fixed;inset:0}
+.loading{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:1;padding:10px 18px;border-radius:999px;background:var(--glass);border:1px solid var(--line);color:var(--ink-2);font-size:14px;box-shadow:var(--shadow)}
+.loading[hidden]{display:none}
 .panel{position:fixed;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);z-index:2}
 #rail{top:16px;left:16px;width:384px;max-height:calc(100dvh - 32px);overflow:auto;display:flex;flex-direction:column;padding:6px 0}
 #detail{top:16px;right:16px;width:384px;max-height:calc(100dvh - 32px);overflow:auto;padding:6px 0}
@@ -170,6 +171,7 @@ details.src p{margin:6px 0 0}
 .signs{display:flex;flex-direction:column;gap:12px}
 .sign{background:var(--sign-bg);color:var(--sign-red);border-radius:10px;padding:5px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 3px 10px rgba(0,0,0,.08)}
 .sign .in{border:1.5px solid currentColor;border-radius:7px;padding:9px 10px 8px;text-align:center;font-family:var(--f-ui);text-transform:uppercase;line-height:1.05;letter-spacing:.02em}
+.sign.inf .in{border-style:dashed}
 .sign.g{color:var(--sign-green)} .sign.b{color:var(--sign-blue)} .sign.k{color:#3B3A36}
 .sign .big{font-weight:800;font-size:20px}
 .sign .mid{font-weight:700;font-size:15px;margin-top:5px}
@@ -218,6 +220,7 @@ details.src p{margin:6px 0 0}
 </head>
 <body>
 <div id="map" aria-label="Parking map"></div>
+<div id="loading" class="loading" role="status">Loading blocks…</div>
 
 <aside id="rail" class="panel collapsed">
   <div class="sec">
@@ -274,7 +277,7 @@ details.src p{margin:6px 0 0}
   </div>
   <div class="sec more">
     <p class="fine" style="margin:0">Drawn from city data, not the curb itself: red curbs, hydrants, driveways and temporary signs aren’t mapped, and the posted sign always wins. LA hasn’t published its permit-district map since 2015, so LA permit streets appear only where permit tickets were written at that block’s own address; holidays suspend LA sweeping.</p>
-    <p class="fine" style="margin:0"><a href="terms.html">Terms &amp; data notes</a> — where this comes from, how current it is, and what it can’t see.</p>
+    <p class="fine" style="margin:0"><a href="terms.html">Terms &amp; data notes</a> — where this comes from, how current it is, and what it can’t see. Wrong block? <a href="https://github.com/polyconic/CurbWatch-LA/issues">Tell us</a>.</p>
     <details class="src"><summary>Sources</summary><p class="fine" id="sources"></p></details>
     <span id="meterNote" hidden></span>
   </div>
@@ -287,7 +290,7 @@ details.src p{margin:6px 0 0}
 
 <noscript><p style="position:fixed;inset:auto 16px 16px;z-index:9;background:var(--panel);padding:12px 16px;border-radius:12px">CurbWatch LA draws its map with JavaScript. Turn it on to see sweeping days, permit streets and ticket history for any block.</p></noscript>
 
-<script src="https://cdn.jsdelivr.net/npm/deck.gl@9.1.14/dist.min.js"></script>
+<script src="vendor/deck.gl-9.1.14.min.js"></script>
 <script src="curb-data.js"></script>
 <script>
 (() => {
@@ -750,7 +753,7 @@ function renderDetail() {
   if (b && b.ev.zone) {
     const g = S.game, nx = nextGame(S.t0);
     hitEvent = !!g;
-    signs.unshift(`<div><div class="sign"><div class="in"><div class="big">No parking</div><div class="mid">4 hours before &amp; during</div><div class="mid">events at Dodger Stadium</div><div class="tag"><span>District D permits exempt</span></div>${b.ev.zone === 2 ? '<div class="sm">Inferred from game-day tickets · check the posted sign</div>' : ''}</div></div>
+    signs.unshift(`<div><div class="sign${b.ev.zone === 2 ? ' inf' : ''}"><div class="in"><div class="big">No parking</div><div class="mid">4 hours before &amp; during</div><div class="mid">events at Dodger Stadium</div><div class="tag"><span>District D permits exempt</span></div>${b.ev.zone === 2 ? '<div class="sm">Inferred from game-day tickets, not a posted sign</div>' : ''}</div></div>
       <div class="smeta">${g ? `<span class="hit">Dodgers vs ${esc(g.opp)} ${fmtD(g.t)} ${fmtT(g.t)} · restricted from ${fmtT(g.t - PRE)}</span>` : `<span class="ok">No home game in your window</span>${nx ? `<span>Next: ${fmtD(nx.t)} ${fmtT(nx.t)} vs ${esc(nx.opp)}</span>` : ''}`}
       ${b.ev.g ? `<span>${b.ev.g} no-parking tickets here on game days in 6 mo${b.ev.o ? `, ${b.ev.o} on other days` : ''}</span>` : ''}<span>Concerts and other stadium events count too</span></div></div>`);
   }
@@ -767,7 +770,7 @@ function renderDetail() {
   if (!s.inWeho && b && isPermit(b) && !b.ev.zone) {
     const pr = b.perm, span = permSpan(pr.hrs), pw = b.pwh;
     const overnight = pr.opd >= 3 && pr.opd >= pr.n;
-    signs.push(`<div><div class="sign g"><div class="in"><div class="big">${overnight ? 'Overnight permit parking' : 'Permit parking'}</div>${span ? `<div class="mid">Ticketed ${fmtMin(span[0] * 60)} to ${fmtMin(span[1] * 60)}</div>` : ''}<div class="sm">District permits exempt · exact hours on the posted sign</div></div></div>
+    signs.push(`<div><div class="sign g inf"><div class="in"><div class="big">${overnight ? 'Overnight permit parking' : 'Permit parking'}</div>${span ? `<div class="mid">Ticketed ${fmtMin(span[0] * 60)} to ${fmtMin(span[1] * 60)}</div>` : ''}<div class="sm">District permits exempt · exact hours on the posted sign</div><div class="tag"><span>From ticket records, not the sign</span></div></div></div>
       <div class="smeta"><span>${pr.n + pr.opd} permit tickets written on this block since ${fmtISO(C.permitRange[0])} 2025, last ${fmtISO(pr.last)}</span>${permHit(b) ? `<span class="hit">${pw} written at your hours</span>` : pw ? `<span>Only ${pw} at your hours (${Math.round(pw / (pr.n + pr.opd) * 100)}%)</span>` : '<span class="ok">None at your hours</span>'}</div></div>`);
     if (permHit(b)) hitPermit = true; else caution.push('Permit street, enforced at other hours');
   }
@@ -927,6 +930,7 @@ deckgl = new deck.Deck({
   onClick: info => { if (!info.coordinate) return; const [lon, lat] = info.coordinate; if (info.layer && info.layer.id === 'lots' && info.object) { query(...info.object.pos, info.object.n || null); return; } query(lon, lat); },
   style: { background: 'var(--ground)' }
 });
+$('#loading').hidden = true;
 $('#zin').onclick = () => { vs = { ...vs, zoom: Math.min(19, vs.zoom + 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
 $('#zout').onclick = () => { vs = { ...vs, zoom: Math.max(11, vs.zoom - 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
 $('#zfit').onclick = () => { vs = { ...fitView(), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ initialViewState: vs }); };

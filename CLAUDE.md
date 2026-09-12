@@ -13,8 +13,12 @@ them. Keep og-image.png at 1200×630, the ratio link previews expect.
 
 ## Layout
 
-- `index.html` — the whole app: one file, inline CSS + JS, deck.gl 9.1.14 from jsDelivr,
-  Fraunces + Figtree from Google Fonts. The basemap is drawn from embedded data (no tiles).
+- `index.html` — the whole app: one file, inline CSS + JS. deck.gl 9.1.14 and the two fonts
+  (Fraunces, Figtree — latin, variable weight, OFL) are self-hosted in `vendor/` so the live
+  site makes no third-party requests; the terms page promises that, keep it true. The basemap
+  is drawn from embedded data (no tiles). Note the Google Fonts URL the page used to carry was
+  malformed (three axes, two-value tuples) and silently 400'd — the fonts never loaded until
+  they were self-hosted.
 - `curb-data.js` — `window.CURB = {...}`, ~5 MB, generated. Don't hand-edit.
 - `tools/fetch.py` → `data/raw/*.json` (gitignored), `tools/build.py` → `curb-data.js`.
 - `tools/make_artifact.py` → `data/artifact.html`, a body-only copy for publishing as a
@@ -27,9 +31,8 @@ and the `blocks` decode in `index.html` before changing either.
 
 ## Before launch
 
-- Replace `https://curbwatch.example/` with the real domain in `index.html` (canonical,
-  `og:url`, `og:image`, `twitter:image`, JSON-LD), `robots.txt` and `sitemap.xml`.
-  Add `CNAME` for Pages. See `quietbroadcast/CLAUDE.md` for the HTTPS/DNS ordering gotcha.
+- Domain is curbwatch.la (Namecheap, registered 2026-09-11); `CNAME` is in the repo. See
+  `quietbroadcast/CLAUDE.md` for the HTTPS/DNS ordering gotcha if the certificate sticks.
 - Page title/description live in `index.html` `<head>`; keep `og:`/`twitter:` copies in sync.
 
 - `terms.html` is the disclaimer/privacy page, linked from the rail footnote and the sitemap.

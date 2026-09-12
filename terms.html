@@ -5,14 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Terms &amp; data notes · CurbWatch LA</title>
 <meta name="description" content="Where CurbWatch LA's data comes from, how current it is, what it can't tell you, and what it stores about you (nothing).">
-<link rel="canonical" href="https://curbwatch.example/terms.html">
+<link rel="canonical" href="https://curbwatch.la/terms.html">
 <link rel="icon" href="/FAVICON2.png" type="image/png">
 <meta name="theme-color" content="#EEEAE1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1C1B18" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,600,100&family=Figtree:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="/vendor/fonts.css">
 <style>
 :root{--ground:#EEEAE1;--panel:#FBFAF6;--ink:#2A2926;--ink-2:#6B675F;--ink-3:#9A958B;--line:#E2DDD1;--moss:#4E7A52;--red:#C8433B}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#1C1B18;--panel:#26241F;--ink:#EDE9DF;--ink-2:#A9A497;--ink-3:#7D786C;--line:#3B3831;--moss:#7FB08A;--red:#E0625A}}
@@ -91,10 +89,11 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
   <p>No accounts, no tracking, no analytics, no advertising, no cookies. Nothing you search or
   click is sent anywhere or recorded. Your chosen light or dark theme is stored in your own
   browser and never leaves it.</p>
-  <p>The page makes one live request, to the city's public meter-occupancy feed, so open spaces
-  show current readings. That request comes from your browser to the City of Los Angeles and
-  carries nothing about you beyond what any web request carries. If it fails, the map falls back
-  to the readings in the snapshot.</p>
+  <p>Everything the page needs — the map library, the fonts, the data — is served from this site,
+  so no third party sees you visit. The one outside request goes to the City of Los Angeles'
+  public meter-occupancy feed, so open spaces show current readings; it comes from your browser
+  and carries nothing about you beyond what any web request carries. If it fails, the map falls
+  back to the readings in the snapshot.</p>
   <p>The citation data behind this map is aggregated by block before publishing. It contains no
   licence plates, vehicle details, ticket numbers or anything identifying a person — only counts,
   violation types, times and fine amounts.</p>
@@ -106,7 +105,8 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
 
   <h2>Corrections</h2>
   <p>Found a block that's wrong? That's useful — the gap between what's published and what's on
-  the curb is the whole point of this project.</p>
+  the curb is the whole point of this project. <a href="https://github.com/polyconic/CurbWatch-LA/issues">Open an issue on GitHub</a>
+  with the street, the block, and what the sign actually says.</p>
 
   <footer>
     <p><a href="/">← Back to the map</a></p>
