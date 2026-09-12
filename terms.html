@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Terms &amp; data notes · CurbWatch LA</title>
+<title>Terms &amp; Data Notes · CurbWatch LA</title>
 <meta name="description" content="Where CurbWatch LA's data comes from, how current it is, what it can't tell you, and what it stores about you (nothing).">
 <link rel="canonical" href="https://curbwatch.la/terms.html">
 <link rel="icon" href="/FAVICON2.png" type="image/png">
@@ -38,20 +38,22 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
 <body>
 <main>
   <p class="top"><a href="/">← CurbWatch LA</a></p>
-  <h1>Terms &amp; data notes</h1>
-  <p class="sub">What CurbWatch LA knows, how it knows it, and where it stops.</p>
+  <h1>Terms &amp; Data Notes</h1>
+  <p class="sub">What CurbWatch LA knows, how it knows it, and where its limits are.</p>
 
   <div class="callout">
     <p><strong>The posted sign is the authority. This map is not.</strong> Use it to plan, then read the
-    curb. If the two disagree, the sign wins, and a parking officer will agree with the sign.</p>
+    curb. If the two disagree, the sign wins, and a parking officer will agree with the sign. Please
+    report it to us!</p>
   </div>
 
   <h2>What this is</h2>
   <p>A free, independent map of street-parking rules and enforcement for part of Los Angeles,
   built from public records. It covers the City of Los Angeles and West Hollywood. Beverly Hills
-  falls inside the map's frame but outside its coverage — it runs its own parking rules and
-  doesn't publish them, so it's greyed out and the app says it has nothing to tell you there. It isn't affiliated with, endorsed by, or run by the City of
-  Los Angeles, LADOT, the City of West Hollywood, or any other agency or company.</p>
+  falls inside the map's frame but outside its coverage; it doesn't publish this data, so the map
+  says so rather than guessing. It isn't affiliated with, endorsed by, or run by the City of
+  Los Angeles, LADOT, the City of West Hollywood, or any other agency or company. We are a very
+  small team behind this project.</p>
 
   <h2>Where the data comes from</h2>
   <ul>
@@ -62,39 +64,38 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
     <li><strong>County of Los Angeles</strong> — address points and city boundaries.</li>
     <li><strong>OpenStreetMap</strong> — streets, parks, off-street lots, and plate-reader camera
     locations. © OpenStreetMap contributors, <a href="https://opendatacommons.org/licenses/odbl/1-0/">ODbL 1.0</a>.
-    Those parts of the data file are a derivative database and stay under that licence — see
+    Those parts of the data file are a derivative database and stay under that license — see
     <a href="https://github.com/polyconic/CurbWatch-LA/blob/main/DATA-LICENSE.md">DATA-LICENSE.md</a>.</li>
     <li><strong>Dodger Stadium home dates</strong> — kept by hand from the published schedule.</li>
   </ul>
 
-  <h2>It's a snapshot, and it ages</h2>
+  <h2>It is a snapshot</h2>
   <p>The map carries a build date and the date its ticket records run through. Nothing updates
-  by itself between builds. Schedules change, districts get added, meters get repriced, and
-  enforcement patterns shift after a neighbourhood complaint. An old snapshot stays confidently
-  wrong, which is why the date is on the screen.</p>
+  by itself between builds. Things change. An old snapshot stays confidently wrong, which is why
+  the date is on the screen and we will do our best to keep this updated frequently.</p>
 
   <h2>Some of it is inferred, not official</h2>
   <p>Los Angeles hasn't published a permit-district map since 2015, and that map no longer matches
-  the street. So permit streets here are worked out from where permit tickets were actually
+  the street. So some permit streets here are worked out from where permit tickets were actually
   written, and the Dodger Stadium game-day zone is assembled the same way, from ticket patterns
-  and local knowledge. These are this project's inferences, labelled as such in the app. They can
-  be wrong in both directions: a permit street nobody has ticketed yet looks identical to a free
-  one.</p>
+  and local knowledge. These are this project's inferences, labeled as such. They can be wrong in
+  both directions: a permit street nobody has ticketed yet looks identical to a free one.</p>
 
   <h2>Silence isn't safety</h2>
-  <p>About a fifth of the blocks here have no records at all — no sweeping route, no meter, no
-  permit ticket, no citation. The app says so plainly on those blocks rather than calling them
+  <p>About a fifth of the blocks here have no records at all. No sweeping route, no meter, no
+  permit ticket, and no citation. The app says so plainly on those blocks rather than calling them
   clear, because the city not having published something is not the same as the curb being free.
   Another one in twelve has tickets but no rule we can point to, which usually means a sign
-  exists that the city's own map doesn't carry.</p>
-  <p>Even the mapped rules have soft edges: LA's sweeping routes were digitised from paper maps
+  exists that the city's own map doesn't carry. Again, please report these to us so we can keep
+  them updated!</p>
+  <p>Even the mapped rules have soft edges: LA's sweeping routes were digitized from paper maps
   and the source itself calls them a visual reference, with segments that can be missing or
   extraneous.</p>
 
   <h2>What it can't see at all</h2>
   <p>No dataset covers red curbs, hydrants, driveways, loading zones, temporary no-parking signs
   for filming or construction, valet hours, or a sweeper that didn't show up. Ticket history
-  describes the past; it doesn't promise anything about today.</p>
+  describes only the past.</p>
 
   <h2>No warranty</h2>
   <p>This is provided as is, without warranty of any kind. Parking decisions are yours, and so are
@@ -104,14 +105,14 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
   <h2>Privacy</h2>
   <p>No accounts, no tracking, no analytics, no advertising, no cookies. Nothing you search or
   click is sent anywhere or recorded. Your chosen light or dark theme is stored in your own
-  browser and never leaves it.</p>
-  <p>Everything the page needs — the map library, the fonts, the data — is served from this site,
-  so no third party sees you visit. The one outside request goes to the City of Los Angeles'
-  public meter-occupancy feed, so open spaces show current readings; it comes from your browser
-  and carries nothing about you beyond what any web request carries. If it fails, the map falls
-  back to the readings in the snapshot.</p>
+  browser and never leaves it. We care about your privacy, a lot.</p>
+  <p>Everything the page needs — the map library and the data — is served from this site, so no
+  third party sees you visit. The one outside request goes to the City of Los Angeles' public
+  meter-occupancy feed, so open spaces show current readings; it comes from your browser and
+  carries nothing about you beyond what any web request carries. If it fails, the map falls back
+  to the readings in the snapshot.</p>
   <p>The citation data behind this map is aggregated by block before publishing. It contains no
-  licence plates, vehicle details, ticket numbers or anything identifying a person — only counts,
+  license plates, vehicle details, ticket numbers or anything identifying a person — only counts,
   violation types, times and fine amounts.</p>
 
   <h2>Plate-reader cameras</h2>
@@ -120,9 +121,10 @@ footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;font-si
   that it isn't there. Manufacturer names are shown to describe the hardware, nothing more.</p>
 
   <h2>Corrections</h2>
-  <p>Found a block that's wrong? That's useful — the gap between what's published and what's on
-  the curb is the whole point of this project. <a href="mailto:hello@curbwatch.la?subject=CurbWatch%20LA%20correction">hello@curbwatch.la</a>
-  with the street, the block, and what the sign actually says.</p>
+  <p>Found a block that's wrong? The gap between what's published and what's on the curb is the
+  whole point of this project. Please reach out to
+  <a href="mailto:hello@curbwatch.la?subject=CurbWatch%20LA%20correction">hello@curbwatch.la</a>
+  with the street, the block, and what the sign actually says. Thank you!</p>
 
   <footer>
     <p><a href="/">← Back to the map</a></p>
