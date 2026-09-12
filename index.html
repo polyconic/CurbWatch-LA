@@ -573,7 +573,8 @@ function layers() {
     new D.PathLayer({ id: 'overlay', data: overlay, getPath: d => d.path, getColor: colorFor, getWidth: 7, widthUnits: 'meters', widthMinPixels: z < 13 ? 1.2 : 1.8, widthMaxPixels: 9,
       capRounded: true, jointRounded: true, pickable: true, autoHighlight: true, highlightColor: A(T.ink, .35),
       updateTriggers: { getColor: [S.mode, S.t0, S.t1, S.tcat, S.tAll, T.ground] } }),
-    new D.PathLayer({ id: 'sel-line', data: selPath, getPath: d => d, getColor: A(T.ink, .9), getWidth: 12, widthUnits: 'meters', widthMinPixels: 4, capRounded: true, jointRounded: true }),
+    new D.PathLayer({ id: 'sel-line', data: selPath, getPath: d => d, getColor: A(T.ink, .9), getWidth: 12, widthUnits: 'meters', widthMinPixels: 5, widthMaxPixels: 14, capRounded: true, jointRounded: true,
+      updateTriggers: { getColor: T.ground } }),
     new D.ScatterplotLayer({ id: 'meters', data: meters, visible: S.showMeters && z >= 14.5, getPosition: d => d.pos, radiusUnits: 'meters', getRadius: 2.6, radiusMinPixels: z >= 16 ? 3 : 2,
       getFillColor: d => d.st === 2 && d.age < 240 ? T.green : d.st === 1 && d.age < 240 ? A(T.ink, .45) : A(T.green, .55), stroked: true, getLineColor: A(T.ground, 1), lineWidthMinPixels: .8,
       pickable: true, updateTriggers: { getFillColor: [T.ground, occTime] } }),
@@ -581,7 +582,12 @@ function layers() {
     new D.ScatterplotLayer({ id: 'alpr', data: alpr, visible: S.showAlpr, getPosition: d => d.pos, radiusUnits: 'pixels', getRadius: d => (d.flock ? 4.5 : 3.5) * (z >= 15 ? 1.2 : 1),
       getFillColor: d => d.flock ? T.flock : A(T['ink-3'], .9), stroked: true, getLineColor: A(T.panel, 1), lineWidthUnits: 'pixels', getLineWidth: 1.5, pickable: true,
       updateTriggers: { getFillColor: T.ground, getLineColor: T.ground, getRadius: z >= 15 } }),
-    new D.ScatterplotLayer({ id: 'pin', data: S.sel ? [S.sel.pt] : [], getPosition: d => d, radiusUnits: 'pixels', getRadius: 7, getFillColor: T.ink, stroked: true, getLineColor: T.ground, lineWidthMinPixels: 2.5 }),
+    new D.ScatterplotLayer({ id: 'pin-halo', data: S.sel ? [S.sel.pt] : [], getPosition: d => d, radiusUnits: 'pixels', getRadius: 22, getFillColor: A(T.ink, .14),
+      updateTriggers: { getFillColor: T.ground } }),
+    new D.ScatterplotLayer({ id: 'pin-ring', data: S.sel ? [S.sel.pt] : [], getPosition: d => d, radiusUnits: 'pixels', getRadius: 13, getFillColor: A(T.ground, .95),
+      stroked: true, getLineColor: T.ink, lineWidthUnits: 'pixels', getLineWidth: 3, updateTriggers: { getFillColor: T.ground, getLineColor: T.ground } }),
+    new D.ScatterplotLayer({ id: 'pin', data: S.sel ? [S.sel.pt] : [], getPosition: d => d, radiusUnits: 'pixels', getRadius: 5.5, getFillColor: T.ink,
+      updateTriggers: { getFillColor: T.ground } }),
   ];
   if (fontReady) {
     const lbls = labels.filter(l => z >= 15 || (z >= 13.4 && l.c <= 2) || (l.c <= 1 && z >= 12.5));
@@ -909,6 +915,8 @@ function update() {
 function setWindow(a, b) { S.t0 = a; S.t1 = Math.max(b, a + 15 * MIN); $('#t0').value = toInput(S.t0); $('#t1').value = toInput(S.t1); update(); }
 function preset(p) {
   const now = laNow(), today = dayStart(now);
+  // the default covers the hour you've already been parked plus the next two
+  if (p === 'default') { const a = Math.floor((now - 36e5) / (15 * MIN)) * 15 * MIN; setWindow(a, a + 3 * 36e5); }
   if (p === 'now') setWindow(Math.floor(now / (15 * MIN)) * 15 * MIN, Math.floor(now / (15 * MIN)) * 15 * MIN + 2 * 36e5);
   if (p === 'tonight') { const d = now > today + 21.5 * 36e5 ? today + DAY : today; setWindow(d + 20 * 36e5, d + 22 * 36e5); }
   if (p === 'overnight') { const d = now > today + 22 * 36e5 ? today + DAY : today; setWindow(d + 19 * 36e5, d + DAY + 9 * 36e5); }
@@ -994,7 +1002,7 @@ $('#reset').onclick = () => {
   $('#mode').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === 'window'));
   S.showMeters = S.showLots = S.showAlpr = true; S.showDistricts = false;
   for (const [id, on] of [['showMeters', true], ['showLots', true], ['showAlpr', true], ['showDistricts', false]]) $('#' + id).checked = on;
-  preset('tonight');
+  preset('default');
   vs = { ...fitView(), transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, transitionInterpolator: new deck.FlyToInterpolator() };
   deckgl.setProps({ initialViewState: vs });
   q.focus();
@@ -1006,7 +1014,7 @@ new MutationObserver(onTheme).observe(document.documentElement, { attributes: tr
 $('#sources').innerHTML = `Sources: Dodger Stadium home dates, LADOT meters &amp; sensors, StreetsLA sweeping routes, LA parking citations (${fmtISO(C.citeRange[0])}–${fmtISO(C.citeRange[1])}; permit tickets from ${fmtISO(C.permitRange[0])} 2025), City of West Hollywood GIS, LA County addresses, OpenStreetMap, plate-reader locations from OpenStreetMap as mapped for DeFlock (${alpr.length} in area, ${alpr.filter(a => a.flock).length} Flock). Built ${esc(C.meta.built)}.`;
 
 
-preset('tonight');
+preset('default');
 // open on one block as a worked example — Lemoyne has sweeping, meters and a permit street
 // that isn't on LA's 2015 map, so the panel shows what this thing actually does
 const init = geocode('1157 Lemoyne St');
