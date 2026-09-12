@@ -100,9 +100,9 @@ button,input,select{font:inherit;color:inherit}
 .iconbtn{width:30px;height:30px;border:0;border-radius:50%;background:var(--panel-2);color:var(--ink-2);cursor:pointer;display:grid;place-items:center;padding:0;transition:background .15s,color .15s}
 .iconbtn:hover{background:var(--line);color:var(--ink)}
 .iconbtn svg{width:16px;height:16px}
-.iconbtn .moon{display:none}
-:root[data-theme="dark"] .iconbtn .moon{display:block}
-:root[data-theme="dark"] .iconbtn .sun{display:none}
+.iconbtn .sun{display:none}
+:root[data-theme="dark"] .iconbtn .sun{display:block}
+:root[data-theme="dark"] .iconbtn .moon{display:none}
 .brand h1{margin:0;font:700 29px/1 var(--f-display);letter-spacing:-.022em}
 .brand h1 span{color:var(--moss)}
 .brand p{margin:6px 0 0;color:var(--ink-2);font-size:13.5px;line-height:1.45}
@@ -227,6 +227,9 @@ details.src p{margin:6px 0 0}
         <button class="iconbtn" id="theme" type="button" aria-label="Switch theme" title="Switch theme">
           <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6L17 17M7 7L5.4 5.4"/></svg>
           <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M20.5 14.3A8.6 8.6 0 0 1 9.7 3.5a8.6 8.6 0 1 0 10.8 10.8z"/></svg>
+        </button>
+        <button class="iconbtn" id="reset" type="button" aria-label="Reset the map" title="Reset">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.2 12a8.8 8.8 0 1 0 2.6-6.2"/><path d="M3 3.4V9h5.6"/></svg>
         </button>
         <button class="chip railtoggle" id="railToggle" aria-expanded="false">Options</button>
       </div>
@@ -948,6 +951,18 @@ $('#theme').onclick = () => {
   document.documentElement.dataset.theme = next; store.set('curbwatch-theme', next); syncTheme();
 };
 syncTheme();
+$('#reset').onclick = () => {
+  S.sel = null; $('#detail').hidden = true;
+  q.value = ''; sugg.hidden = true; sList = []; sIdx = -1;
+  S.mode = 'window'; S.tcat = -1; S.tAll = false;
+  $('#mode').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === 'window'));
+  S.showMeters = S.showLots = S.showAlpr = true; S.showDistricts = false;
+  for (const [id, on] of [['showMeters', true], ['showLots', true], ['showAlpr', true], ['showDistricts', false]]) $('#' + id).checked = on;
+  preset('tonight');
+  vs = { ...fitView(), transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, transitionInterpolator: new deck.FlyToInterpolator() };
+  deckgl.setProps({ initialViewState: vs });
+  q.focus();
+};
 const onTheme = () => { syncTheme(); readTokens(); update(); };
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { if (!store.get('curbwatch-theme')) { delete document.documentElement.dataset.theme; onTheme(); } });
 new MutationObserver(onTheme).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
