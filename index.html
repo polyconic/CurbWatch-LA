@@ -65,6 +65,9 @@
   --focus:#4E7A52; --shadow:0 1px 2px rgba(42,41,38,.06),0 12px 40px rgba(42,41,38,.14);
   --sign-bg:#FCFBF6; --sign-red:#B9302C; --sign-green:#2E6B44; --sign-blue:#2C55A8;
   --f-display:"Helvetica Neue",Helvetica,Arial,sans-serif; --f-ui:"Helvetica Neue",Helvetica,Arial,sans-serif;
+  /* the viewport is viewport-fit=cover, so panels clear the notch/Dynamic Island and home indicator themselves */
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-l:env(safe-area-inset-left,0px); --safe-r:env(safe-area-inset-right,0px);
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --ground:#1C1B18; --panel:#26241F; --panel-2:#2F2C26; --glass:rgba(38,36,31,.88); --ink:#EDE9DF; --ink-2:#A9A497; --ink-3:#7D786C; --line:#3B3831; --line-2:#332F29;
@@ -205,17 +208,17 @@ details.src p{margin:6px 0 0}
 .mgrid i{width:11px;height:11px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line)}
 .mgrid i.v{background:var(--green);border-color:var(--green)}
 .mgrid i.o{background:var(--ink-3);border-color:var(--ink-3)}
-.zoom{position:fixed;right:16px;bottom:30px;display:flex;flex-direction:column;z-index:1;border-radius:999px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(14px)}
+.zoom{position:fixed;right:calc(16px + var(--safe-r));bottom:calc(30px + var(--safe-b));display:flex;flex-direction:column;z-index:1;border-radius:999px;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);background:var(--glass);backdrop-filter:blur(14px)}
 .zoom button{width:38px;height:38px;border:0;background:none;cursor:pointer;font-size:18px;color:var(--ink-2)}
 .zoom button:hover{color:var(--ink)}
-.attr{position:fixed;left:16px;bottom:8px;font-size:11px;color:var(--ink-3);z-index:1;pointer-events:none}
+.attr{position:fixed;left:calc(16px + var(--safe-l));bottom:calc(8px + var(--safe-b));font-size:11px;color:var(--ink-3);z-index:1;pointer-events:none}
 .deck-tooltip{font:13px/1.35 var(--f-ui)!important}
 .railtoggle{display:none}
 .dbtns{display:flex;gap:6px;flex:none}
 .sheet{display:none}
 .sheet svg{width:16px;height:16px;transition:transform .2s}
 @media (max-width:760px){
-  #rail{left:8px;right:8px;top:8px;width:auto;max-height:52dvh}
+  #rail{left:calc(8px + var(--safe-l));right:calc(8px + var(--safe-r));top:calc(8px + var(--safe-t));width:auto;max-height:calc(52dvh - var(--safe-t))}
   #rail.collapsed .more{display:none}
   .railtoggle{display:inline-block}
   .brand h1{font-size:24px}
@@ -229,7 +232,7 @@ details.src p{margin:6px 0 0}
   body.has-sel #rail .sec:first-child{padding:10px 14px 12px;gap:8px}
   body.has-sel #rail .search input{height:38px}
   /* the detail panel is a bottom sheet: peek shows the verdict, tap the header or chevron for the rest */
-  #detail{left:8px;right:8px;top:auto;bottom:8px;width:auto;max-height:74dvh}
+  #detail{left:calc(8px + var(--safe-l));right:calc(8px + var(--safe-r));top:auto;bottom:calc(8px + var(--safe-b));width:auto;max-height:calc(74dvh - var(--safe-t) - var(--safe-b))}
   #detail.peek .sec:not(:first-child),#detail.peek .basis{display:none}
   #detail .dhead{cursor:pointer}
   #detail .dhead h2{font-size:21px}
