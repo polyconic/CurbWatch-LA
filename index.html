@@ -973,12 +973,16 @@ q.onblur = () => setTimeout(() => sugg.hidden = true, 100);
 // ---------- map setup
 readTokens();
 const el = $('#map');
-function fitView() {
-  const w = el.clientWidth, wide = w > 900, free = wide ? w - 416 - 416 + 120 : w, z = Math.log2(free / 512 * 360 / 0.166);
-  const shift = wide ? 0 : 0, zz = Math.min(Math.max(z, 11), 14);
-  return { longitude: -118.3125 - shift * 360 / (512 * Math.pow(2, zz)), latitude: 34.0805, zoom: zz, pitch: 0, bearing: 0, minZoom: 11, maxZoom: 19 };
+// fit the whole coverage area into the part of the screen the panels don't cover
+function fitView(withDetail) {
+  const w = el.clientWidth, h = el.clientHeight, wide = w > 900;
+  const left = wide ? 400 : 0, right = wide && withDetail ? 400 : 0, free = w - left - right;
+  const zw = Math.log2(free * .92 * 360 / (512 * .166)), zh = Math.log2(h * .86 * 360 / (512 * .07 * 1.206));
+  const zz = Math.min(Math.max(Math.min(zw, zh), 11), 14);
+  const shiftPx = (left - right) / 2;
+  return { longitude: -118.3125 - shiftPx * 360 / (512 * Math.pow(2, zz)), latitude: 34.0805, zoom: zz, pitch: 0, bearing: 0, minZoom: 11, maxZoom: 19 };
 }
-let vs = fitView(); viewZoom = vs.zoom;
+let vs = fitView(true); viewZoom = vs.zoom;
 function fly(pt, zoom) {
   vs = { ...vs, longitude: pt[0] + (innerWidth > 900 ? 0.0009 * Math.pow(2, 17 - zoom) : 0), latitude: pt[1] - (innerWidth <= 760 ? 0.0006 * Math.pow(2, 17 - zoom) : 0), zoom, transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900, transitionInterpolator: new deck.FlyToInterpolator() };
   deckgl.setProps({ initialViewState: vs });
@@ -997,7 +1001,7 @@ deckgl = new deck.Deck({
 setTimeout(noWebGL, 12000);
 $('#zin').onclick = () => { vs = { ...vs, zoom: Math.min(19, vs.zoom + 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
 $('#zout').onclick = () => { vs = { ...vs, zoom: Math.max(11, vs.zoom - 1), transitionDuration: 250 }; deckgl.setProps({ initialViewState: vs }); };
-$('#zfit').onclick = () => { vs = { ...fitView(), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ initialViewState: vs }); };
+$('#zfit').onclick = () => { vs = { ...fitView(!!S.sel), transitionDuration: 600, transitionInterpolator: new deck.FlyToInterpolator() }; deckgl.setProps({ initialViewState: vs }); };
 
 const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} } };
 const saved = store.get('curbwatch-theme');
@@ -1023,7 +1027,7 @@ $('#reset').onclick = () => {
   S.showMeters = S.showLots = S.showAlpr = true; S.showDistricts = false;
   for (const [id, on] of [['showMeters', true], ['showLots', true], ['showAlpr', true], ['showDistricts', false]]) $('#' + id).checked = on;
   preset('default');
-  vs = { ...fitView(), transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, transitionInterpolator: new deck.FlyToInterpolator() };
+  vs = { ...fitView(false), transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 600, transitionInterpolator: new deck.FlyToInterpolator() };
   deckgl.setProps({ initialViewState: vs });
   if (innerWidth > 760) q.focus();
 };
