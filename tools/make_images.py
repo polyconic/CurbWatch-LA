@@ -1,4 +1,4 @@
-"""Build og-image.png (1200x630 social card) from Greg's artwork, CURBWATCHLA.png.
+"""Build og-image.png (1200x630 social card) from Greg's artwork, CURBWATCHLA2.png.
 
 The lettering is pixel art, so it is scaled by whole numbers with nearest-neighbour
 sampling — never resampled — and centred on a canvas painted in the artwork's own
@@ -10,7 +10,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 W, H, MARGIN = 1200, 630, 56
 
-src = Image.open(ROOT / 'CURBWATCHLA.png').convert('RGBA')
+src = Image.open(ROOT / 'CURBWATCHLA2.png').convert('RGBA')
 bg = src.getpixel((4, 4))[:3]
 
 flat = Image.new('RGB', src.size, bg)
