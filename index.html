@@ -509,6 +509,7 @@ function classify() {
   for (const b of blocks) {
     if (S.mode === 'window') {
       const busy = b.win[0] + b.win[1] + b.win[2] + b.win[3], pm = isPermit(b) && !b.ev.zone;
+      b.rec = (b.routes.length || b.nmet || b.perm || b.ev.zone) ? 2 : b.all.some(n => n > 0) ? 1 : 0;
       b.lvl = b.sweepHit || b.evHit ? 5 : (pm && permHit(b)) ? 4 : ((pm && b.perm) || (busy >= 3 && busy / b.len * 100 >= 2)) ? 3 : b.nmet ? 2 : 1;
     } else if (S.mode === 'tickets') {
       const v = ticketVal(b); b.lvl = v <= 0 ? 0 : v < tBreaks[0] ? 1 : v < tBreaks[1] ? 2 : v < tBreaks[2] ? 3 : 4;
@@ -530,7 +531,10 @@ function classify() {
 }
 function colorFor(it) {
   const L = it.lvl;
-  if (S.mode === 'window') return [null, A(T.unpainted, T.dark ? .38 : .55), A(T.green, .9), A(T.amber, .95), A(T.blue, .95), A(T.red, 1)][L] || [0, 0, 0, 0];
+  if (S.mode === 'window') {
+    if (L === 1 && it.rec === 0) return A(T['ink-3'], T.dark ? .22 : .3);
+    return [null, A(T.unpainted, T.dark ? .38 : .55), A(T.green, .9), A(T.amber, .95), A(T.blue, .95), A(T.red, 1)][L] || [0, 0, 0, 0];
+  }
   if (S.mode === 'tickets') {
     const r = T.red, lo = T.dark ? [90, 60, 62] : [236, 180, 170];
     const mix = t => [0, 1, 2].map(j => Math.round(lo[j] + (r[j] - lo[j]) * t));
@@ -805,11 +809,12 @@ function renderDetail() {
       ${span ? `<span>Meter tickets: ${fmtMin(span[0] * 60)}–${fmtMin(span[1] * 60)}</span>` : ''}${b && b.nmet ? (mw ? `<span>${mw} meter tickets at your hours</span>` : `<span class="ok">No meter tickets at your hours in 6 mo</span>`) : ''}</div>
       ${sensed.length ? `<div class="mgrid" style="margin-top:6px" aria-label="Sensed spaces">${sensed.slice(0, 40).map(m => `<i class="${m.st === 2 ? 'v' : 'o'}" title="${esc(m.id)}"></i>`).join('')}</div>` : ''}</div>`);
   }
-  if (!signs.length) signs.push(`<div><div class="sign k"><div class="in"><div class="mid">No posted rules in city data</div><div class="sm">No sweeping route, permit district or meter mapped here</div></div></div></div>`);
+  if (!signs.length) signs.push(`<div><div class="sign k inf"><div class="in"><div class="mid">${b && b.rec === 0 ? 'No records for this block' : 'No posted rules in city data'}</div><div class="sm">${b && b.rec === 0 ? 'Not in any sweeping route, meter list or ticket record — read the curb' : 'No sweeping route, permit street or meter mapped here'}</div></div></div></div>`);
   if (b) { const busy = b.win[0] + b.win[1] + b.win[2] + b.win[3]; if (busy >= 3 && busy / b.len * 100 >= 2) caution.push(`${busy} tickets written on this block at these hours in 6 months`); }
   if (nearStadium(s.pt) && /SUNSET/.test(b ? b.name : '')) caution.push('Sunset Bl restrictions change on Dodger game days — read the temporary signs');
   const winTxt = winLabel();
   const winTot = b ? b.win.reduce((x, y) => x + y, 0) : 0;
+  const tot = b ? b.all.reduce((x, y) => x + y, 0) : 0;
   const since = fmtISO(C.citeRange[0]);
   const record = !b ? 'No ticket history for this spot.'
     : winTot ? `${winTot} ticket${winTot === 1 ? '' : 's'} of any kind ${winTot === 1 ? 'was' : 'were'} written on this block at these hours since ${since}.`
@@ -820,9 +825,11 @@ function renderDetail() {
   else if (hitPermit) v = [T.blue, 'Permit hours, by the ticket record', s.inWeho ? 'West Hollywood’s posted hours make this block permit-only during your window.' : `${b.pwh} permit tickets were written here at these hours in the last 18 months.`];
   else if (caution.length) v = [T.amber, 'Check the signs', caution.join(' · ')];
   else if (s.mets.length) v = [T.green, 'Metered, nothing else in the data', `No sweeping, permit or event restriction covers this block in your window. ${record}`];
-  else v = [T.unpainted, 'Nothing restricts this in the data', `No sweeping route, permit street or event zone covers this block in your window. ${record}`];
+  else if (b && b.rec === 0) v = [T['ink-3'], 'No data for this block', `Nothing in the city's records reaches this block: no sweeping route, no meter, no permit tickets, and no citation of any kind since ${since}. That's missing information, not permission — whatever is posted here, we can't see it.`];
+  else if (b && b.rec === 1) v = [T.amber, 'Ticketed here, but no rule mapped', `${tot} ticket${tot === 1 ? '' : 's'} written on this block since ${since}, yet no sweeping route, meter or permit street covers it. Something is posted that the city's own map doesn't show.`];
+  else if (!b) v = [T['ink-3'], 'No data for this spot', 'This point isn’t on a mapped block, so there’s nothing to report. Try clicking the street itself.'];
+  else v = [T.unpainted, 'Nothing restricts this in your window', `No sweeping route, permit street or event zone covers this block in your window. ${record}`];
   const cityTxt = s.inWeho ? 'West Hollywood' : 'City of Los Angeles';
-  const tot = b ? b.all.reduce((x, y) => x + y, 0) : 0;
   const fineOf = v => C.fines[v];
   const lotsHTML = s.lots.map(([l, d]) => `<button class="li" data-lot="${lots.indexOf(l)}"><span class="p ${l.k === 'city' ? '' : l.acc === 'customers' ? 'c' : 'o'}">P</span><span>${esc(l.n || (l.k === 'garage' ? 'Parking garage' : 'Parking lot'))}<small>${esc(lotLine(l))}${l.src === 'LADOT' && l.sf ? ' · ' + esc(l.sf.slice(0, 110)) + (l.sf.length > 110 ? '…' : '') : ''}</small></span><span class="d">${Math.round(d / 10) * 10} m</span></button>`).join('');
   el.innerHTML = `
@@ -861,7 +868,9 @@ function renderLegend() {
   let items = [], sub = '';
   if (S.mode === 'window') {
     items = [[T.red, S.game ? 'Street cleaning or Dodger game restriction' : 'Street cleaning during your window', cnt(b => b.lvl === 5)], [T.blue, 'Permit tickets written at these hours', cnt(b => b.lvl === 4)],
-      [T.amber, 'Permit street (other hours) or heavy ticketing', cnt(b => b.lvl === 3)], [T.green, 'Metered', cnt(b => b.lvl === 2)], [A(T.unpainted, 1), 'Nothing in the data', cnt(b => b.lvl === 1)]];
+      [T.amber, 'Permit street (other hours) or heavy ticketing', cnt(b => b.lvl === 3)], [T.green, 'Metered', cnt(b => b.lvl === 2)],
+      [A(T.unpainted, 1), 'No rule in your window', cnt(b => b.lvl === 1 && b.rec > 0)],
+      [A(T['ink-3'], T.dark ? 90 : 110), 'No records at all for the block', cnt(b => b.lvl === 1 && b.rec === 0)]];
   } else if (S.mode === 'tickets') {
     const r = T.red, lo = T.dark ? [90, 60, 62] : [236, 180, 170], mix = t => [0, 1, 2].map(j => Math.round(lo[j] + (r[j] - lo[j]) * t));
     const f = v => v < 10 ? v.toFixed(1) : Math.round(v);

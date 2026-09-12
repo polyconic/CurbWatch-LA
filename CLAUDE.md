@@ -64,6 +64,11 @@ and the `blocks` decode in `index.html` before changing either.
   that Sunset Bl restrictions change on game days (temporary tow-away along the stadium
   approach), which is posted signage, not in any dataset. `renderGameNote()` must be called
   wherever the selection changes, not just from `update()`.
+- Every block carries `rec`: 2 = a rule is mapped (sweep/meter/permit/event), 1 = tickets but
+  no rule, 0 = nothing at all (2,140 blocks, 18%). Those three get different verdicts and the
+  no-records ones are drawn fainter — never let a block with no records read as "clear".
+  `rec === 1` (295 blocks with 8+ tickets and no rule) is the interesting set: something is
+  posted there that the city's map doesn't carry.
 - Beverly Hills sits inside the bbox but publishes none of this. Its boundary ships as `bh`
   in the data; the map greys it out and a click there gets an out-of-coverage panel instead of
   a verdict — saying "nothing restricts this" about a city we have no data for was a lie.
