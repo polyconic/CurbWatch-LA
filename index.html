@@ -1002,7 +1002,7 @@ function go(text) {
   fly(g.pt, g.num != null ? Z.addr() : Z.street()); query(g.pt[0], g.pt[1], g.label, g.num != null ? { base: g.street.base, num: g.num } : null);
   setURL('?q=' + encodeURIComponent(g.label));
 }
-// searches are linkable (?q=1157 Lemoyne St); the 404 page's search box lands here too
+// searches are linkable (?q=<address>); the 404 page's search box lands here too
 const setURL = s => { try { history.replaceState(null, '', s); } catch (e) {} };
 function clearSel() { S.sel = null; $('#detail').hidden = true; applySheet(); renderGameNote(); redraw(); setURL(location.pathname); }
 q.oninput = () => {
@@ -1031,7 +1031,7 @@ function fitView(withDetail) {
   const shiftPx = (left - right) / 2;
   return { longitude: -118.3125 - shiftPx * 360 / (512 * Math.pow(2, zz)), latitude: 34.0805, zoom: zz, pitch: 0, bearing: 0, minZoom: 11, maxZoom: 19 };
 }
-let vs = fitView(true); viewZoom = vs.zoom;
+let vs = fitView(false); viewZoom = vs.zoom;
 function fly(pt, zoom) {
   // on phones the peek sheet covers more of the bottom than the compact rail does the top, so land the point ~40px above center
   const dy = isMobile() ? 40 * 129770 / Math.pow(2, zoom) / KY : 0;
@@ -1092,15 +1092,10 @@ $('#sources').innerHTML = `Sources: Dodger Stadium home dates, LADOT meters &amp
 
 
 preset('default');
-// a linked search opens on that address; otherwise open on one block as a worked example —
-// Lemoyne has sweeping, meters and a permit street that isn't on LA's 2015 map
+// a linked search opens on that address; otherwise the map opens clean, no block selected
 const linked = new URLSearchParams(location.search).get('q');
 if (linked && geocode(linked)) go(linked);
-else {
-  const init = geocode('1157 Lemoyne St');
-  if (init) query(init.pt[0], init.pt[1], init.label, { base: init.street.base, num: init.num });
-  if (linked) setURL(location.pathname);
-}
+else if (linked) setURL(location.pathname);
 document.fonts.ready.catch(() => {}).finally(() => { fontReady = true; redraw(); });
 
 // live occupancy (works where the page is allowed to reach data.lacity.org; otherwise the build snapshot stays)
