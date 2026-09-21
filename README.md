@@ -4,20 +4,21 @@ Street parking, block by block, from Echo Park to West Hollywood. Search an addr
 
 ## Coverage
 
-Elysian Park west to Doheny, Franklin down to roughly Pico. Labelled on the map:
+Doheny east to the Arts District, Franklin down to roughly Pico. Labeled on the map:
 
 | | |
 |---|---|
 | **Eastside** | Elysian Park, Angelino Heights, Echo Park, Westlake, Silver Lake, Virgil Village |
 | **Central** | Los Feliz, East Hollywood, Koreatown, Hollywood, Larchmont, Hancock Park |
 | **West** | Mid-Wilshire, Fairfax, Beverly Grove, West Hollywood |
+| **Downtown** | Downtown, Chinatown, Little Tokyo, Arts District |
 
-Also inside the covered area, unlabelled: Thai Town, Little Armenia, Historic Filipinotown,
-Rampart Village, Melrose and Carthay. West Hollywood is a separate city with its own rules;
+Also inside the covered area, unlabeled: Thai Town, Little Armenia, Historic Filipinotown,
+Rampart Village, Melrose, Carthay, Bunker Hill and the Civic Center. West Hollywood is a separate city with its own rules;
 it's drawn with a dashed boundary and uses the city's own permit and sweeping schedules.
 
 Beverly Hills falls inside the map's frame but outside its coverage — it publishes none of
-this data, so it's greyed out and a click there says so rather than implying the curb is free.
+this data, so it's grayed out and a click there says so rather than implying the curb is free.
 
 ## Running it
 

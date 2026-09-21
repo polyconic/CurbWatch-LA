@@ -586,7 +586,10 @@ let deckgl, fontReady = false;
 const hoods = [['Echo Park', -118.2605, 34.0785], ['Silver Lake', -118.2705, 34.0905], ['Los Feliz', -118.2925, 34.1085], ['East Hollywood', -118.2985, 34.0915],
   ['Hollywood', -118.3285, 34.1005], ['West Hollywood', -118.3705, 34.0905], ['Fairfax', -118.3615, 34.0785], ['Hancock Park', -118.3295, 34.0675],
   ['Koreatown', -118.3015, 34.0605], ['Westlake', -118.2745, 34.0575], ['Angelino Heights', -118.2505, 34.0705], ['Larchmont', -118.3235, 34.0775],
-  ['Mid-Wilshire', -118.3455, 34.0605], ['Beverly Grove', -118.3775, 34.0745], ['Virgil Village', -118.2875, 34.0805], ['Elysian Park', -118.2415, 34.0835]];
+  ['Mid-Wilshire', -118.3455, 34.0605], ['Beverly Grove', -118.3775, 34.0745], ['Virgil Village', -118.2875, 34.0805], ['Elysian Park', -118.2415, 34.0835],
+  ['Downtown', -118.2516, 34.0502], ['Chinatown', -118.2378, 34.0626],
+  // downtown packs its districts close together, so the small ones wait until you're in
+  ['Little Tokyo', -118.2399, 34.0488, 13.6], ['Arts District', -118.2355, 34.0472, 13.6]];
 
 const RW = [22, 15, 12, 10, 7];
 const roadsMinor = roads.filter(r => r.c > 2), roadsMajor = roads.filter(r => r.c <= 2).sort((a, b) => b.c - a.c);
@@ -633,7 +636,7 @@ function layers() {
       fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 600, characterSet: 'auto', getColor: T.label, fontSettings: { sdf: true, fontSize: 48, buffer: 6 }, outlineWidth: 4, outlineColor: A(T['label-halo'], .95),
       extensions: [new D.CollisionFilterExtension()], collisionEnabled: true, getCollisionPriority: d => (4 - d.c) * 1000 + Math.min(d.len, 999), collisionTestProps: { sizeScale: 2.2 },
       updateTriggers: { getColor: T.ground } }));
-    L.push(new D.TextLayer({ id: 'hoods', data: hoods, visible: z < 15.2, getPosition: d => [d[1], d[2]], getText: d => d[0], getSize: 15, fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 700,
+    L.push(new D.TextLayer({ id: 'hoods', data: hoods.filter(h => z >= (h[3] || 0)), visible: z < 15.2, getPosition: d => [d[1], d[2]], getText: d => d[0], getSize: 15, fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif', fontWeight: 700,
       characterSet: 'auto', getColor: A(T.ink, T.dark ? .55 : .5), fontSettings: { sdf: true, fontSize: 64, buffer: 8 }, outlineWidth: 5, outlineColor: A(T.ground, .9), getLetterSpacing: 0,
       updateTriggers: { getColor: T.ground } }));
     const lotData = lots.filter(l => S.showLots && (l.k === 'city' ? z >= 12.8 : z >= 15));
@@ -801,7 +804,7 @@ function lotLine(l) {
   return [l.k === 'garage' ? 'Garage' : 'Lot', l.acc === 'customers' ? 'customers only' : l.acc === 'yes' ? 'public' : '', l.fee === 'yes' ? 'paid' : l.fee === 'no' ? 'free' : '', l.s ? l.s + ' spaces' : '', l.h].filter(Boolean).join(' · ');
 }
 const isMobile = () => innerWidth <= 760;
-// close enough to read the block, wide enough to place it: ~1 km across at addr, a neighbourhood at street
+// close enough to read the block, wide enough to place it: ~1 km across at addr, a neighborhood at street
 const Z = { addr: () => isMobile() ? 15.6 : 16.2, street: () => isMobile() ? 14.2 : 14.8, spot: () => isMobile() ? 16.4 : 16.8 };
 // the report link pre-fills the block and what the map said, so a reply only needs what the sign says
 const reportLink = (where, said) => `<span class="report">Incorrect? <a href="mailto:hello@curbwatch.la?subject=${encodeURIComponent('CurbWatch LA correction: ' + where)}&body=${encodeURIComponent('Block: ' + where + '\nThe map says: ' + said + '\nThe sign says: ')}">Report it</a></span>`;
@@ -1030,7 +1033,7 @@ function fitView(withDetail) {
 }
 let vs = fitView(true); viewZoom = vs.zoom;
 function fly(pt, zoom) {
-  // on phones the peek sheet covers more of the bottom than the compact rail does the top, so land the point ~40px above centre
+  // on phones the peek sheet covers more of the bottom than the compact rail does the top, so land the point ~40px above center
   const dy = isMobile() ? 40 * 129770 / Math.pow(2, zoom) / KY : 0;
   vs = { ...vs, longitude: pt[0] + (innerWidth > 900 ? 0.0009 * Math.pow(2, 17 - zoom) : 0), latitude: pt[1] - dy, zoom, transitionDuration: matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 900, transitionInterpolator: new deck.FlyToInterpolator() };
   deckgl.setProps({ viewState: vs });
