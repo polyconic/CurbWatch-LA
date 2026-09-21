@@ -53,10 +53,17 @@ not parking, so they make a misleading first impression.
   is wrong on the ground (W Lanewood Ave sits inside a 2015 district, has no permit
   signs). Every public source was checked; nothing newer exists.
 - **LA permit streets come from tickets**, matched by the *address the officer wrote*,
-  not GPS: a block counts if ≥3 `PREFERENTIAL PARKING` / `OVNIGHT PRK W/OUT PE` tickets
-  on ≥2 days in 18 months have a location on that street within its number range.
-  GPS-only snapping pulled cross-street tickets onto the wrong block (that was the
-  Lanewood bug). All ticket stats use the same address matcher (`match_blocks`).
+  not GPS: `PREFERENTIAL PARKING` / `OVNIGHT PRK W/OUT PE` tickets whose location is on that
+  street within its number range. GPS-only snapping pulled cross-street tickets onto the
+  wrong block (that was the Lanewood bug). All ticket stats use the same address matcher
+  (`match_blocks`).
+- **The bar for calling something a permit street is `PERMIT_MIN` in `build.py`: ≥8 tickets,
+  on ≥5 separate days, across ≥3 separate months** (836 blocks). It was ≥3 tickets on ≥2 days,
+  which called 1,116 blocks permit streets — and Gregor spot-checked several on Street View
+  with no permit signs on them. A handful of tickets over a day or two is as easily a miscoded
+  violation or a neighboring block's address as a posted district; only routine enforcement
+  over months is evidence. `index.html` no longer re-tests the threshold — `build.py` decides,
+  and a block that fails simply has no `perm` record. Raise the bar, never lower it.
 - A permit verdict for the user's window needs ≥3 tickets in those hours **and** ≥5% of
   the block's permit tickets (Sycamore 1700 had 36 of 1,164 at 8–10 PM — noise).
 - **District D** (Dodger Stadium special-event permit zone: no parking 4 hrs before and
@@ -71,10 +78,11 @@ not parking, so they make a misleading first impression.
   approach), which is posted signage, not in any dataset. `renderGameNote()` must be called
   wherever the selection changes, not just from `update()`.
 - Every block carries `rec`: 2 = a rule is mapped (sweep/meter/permit/event), 1 = tickets but
-  no rule, 0 = nothing at all (2,140 blocks, 18%). Those three get different verdicts and the
+  no rule, 0 = nothing at all (2,188 blocks, 19%). Those three get different verdicts and the
   no-records ones are drawn fainter — never let a block with no records read as "clear".
-  `rec === 1` (295 blocks with 8+ tickets and no rule) is the interesting set: something is
-  posted there that the city's map doesn't carry.
+  `rec === 1` (299 blocks with 8+ tickets and no rule) is the interesting set: something is
+  posted there that the city's map doesn't carry. The terms page quotes both shares — a fifth
+  and one in ten — so recompute them when a rule changes.
 - Beverly Hills sits inside the bbox but publishes none of this. Its boundary ships as `bh`
   in the data; the map greys it out and a click there gets an out-of-coverage panel instead of
   a verdict — saying "nothing restricts this" about a city we have no data for was a lie.
@@ -82,6 +90,11 @@ not parking, so they make a misleading first impression.
 - WeHo data is the city's own and has posted hours — trust it over inference.
 - LA sweeping routes are polygons with paired routes (e.g. `5P223 Th` / `5P223 F`):
   one side each day, and the data doesn't say which side.
+- **Only `Route_Type == 'Posted'` sweeping routes are used.** StreetsLA also ships four
+  `Downtown` routes (DT 1–4, 1–4 am, Mon–Fri) covering DTLA and the Arts District. They are
+  real sweeping, but the city doesn't class them as posted no-parking, and drawing a
+  "NO PARKING 1 AM–4 AM" sign for 400 blocks off them was inventing signage. The two
+  `Skid Row` routes are 1–4 am *and* Route_Type `Posted`, so those 15 blocks keep the sign.
 - LA's occupancy feed timestamps are UTC; display converts to LA time.
 - Parkopedia was tried and rejected (403, client-rendered, proprietary).
 - Dodger dates live in `tools/dodgers-home.json`, hand-maintained on purpose: MLB's Stats

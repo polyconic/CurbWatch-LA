@@ -133,6 +133,9 @@ sweep = json.load(open('sweep.json'))
 routes = []; route_polys = []
 for f in sweep:
     a = f['attributes']
+    # StreetsLA classes four downtown routes as Route_Type "Downtown": swept overnight, but not
+    # posted no-parking the way the rest are. We have no sign to show there, so don't draw one.
+    if a['Route_Type'] == 'Downtown': continue
     t0, t1 = [tmin(x) for x in re.split(r'\s+-\s+', a['Posted_Time'])]
     wk = {'1 & 3': 0b0101, '2 & 4': 0b1010, 'Weekly': 0}[a['Weeks']]
     routes.append([a['Route'], dmask(a['Posted_Day']), t0, t1, wk, a['Boundaries'] or ''])
@@ -294,7 +297,13 @@ for p, b in enumerate(pmatch):
     e = bperm.setdefault(b, [0, 0, [0] * 24, ''])
     e[kind] += 1; e[2][hr] += 1; e[3] = max(e[3], day); bdays[b].add(day)
 print('permit tickets matched by address', sum(1 for x in pmatch if x is not None), 'of', len(pmatch))
-bperm = {b: e for b, e in bperm.items() if (e[0] >= 3 or e[1] >= 3) and len(bdays[b]) >= 2}
+# Enough tickets, on enough separate days, spread over enough months that routine enforcement is
+# the only explanation. A few tickets on one or two days is as easily a miscoded violation or a
+# neighboring block's address, and calling that a permit street is a guess.
+PERMIT_MIN = dict(tickets=8, days=5, months=3)
+bmonths = {b: {d[:7] for d in days} for b, days in bdays.items()}
+bperm = {b: e for b, e in bperm.items()
+         if e[0] + e[1] >= PERMIT_MIN['tickets'] and len(bdays[b]) >= PERMIT_MIN['days'] and len(bmonths[b]) >= PERMIT_MIN['months']}
 D['permitRange'] = [RANGE['permit_from'], pc_last]
 print('confirmed permit blocks', len(bperm))
 

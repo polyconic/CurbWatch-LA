@@ -354,7 +354,7 @@ const blocks = C.blocks.map((b, i) => {
     perm: b[11] ? { n: b[11][0], opd: b[11][1], hrs: b[11][2], last: b[11][3] } : null };
 });
 const permHit = b => !!(b.perm && b.pwh >= 3 && b.pwh >= 0.05 * (b.perm.n + b.perm.opd));
-const isPermit = b => !!(b.ppd.length || (b.perm && (b.perm.n >= 3 || b.perm.opd >= 3)));
+const isPermit = b => !!(b.ppd.length || b.perm);  // build.py decides what counts as a permit street
 function permSpan(h) {
   const tot = h.reduce((a, c) => a + c, 0); if (tot < 3) return null;
   let bs = 0, bl = 24;
@@ -553,7 +553,7 @@ function classify() {
     } else if (S.mode === 'sweep') {
       b.lvl = !b.routes.length ? 0 : b.sweepHit ? 5 : !b.next ? 1 : b.next[0] - a < DAY ? 4 : b.next[0] - a < 3 * DAY ? 3 : 2;
     } else {
-      b.lvl = b.ev.zone ? (b.evHit ? 3 : 2) : !isPermit(b) ? 0 : permHit(b) ? 3 : b.perm && b.perm.n + b.perm.opd >= 3 ? 2 : 1;
+      b.lvl = b.ev.zone ? (b.evHit ? 3 : 2) : !isPermit(b) ? 0 : permHit(b) ? 3 : 2;
     }
   }
   wehoSweep.forEach((w, i) => {
